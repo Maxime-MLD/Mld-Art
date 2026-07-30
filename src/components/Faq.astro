@@ -1,0 +1,94 @@
+---
+/* =========================================================================
+   Faq.astro — Questions fréquentes
+   Balisage <details> / <summary> : accessible au clavier nativement.
+   L'ouverture est interceptée dans `animations.js` pour animer la hauteur
+   à la place du saut brutal du navigateur.
+   ========================================================================= */
+
+/* --- DONNÉES : les questions --- */
+// TODO: ajuster les réponses (délais, tarifs, périmètre) à ta réalité
+const faqItems = [
+  {
+    question: 'Combien de temps faut-il pour créer mon site ?',
+    answer:
+      'Comptez deux à quatre semaines entre notre premier échange et la mise en ligne, selon le nombre de pages et le temps nécessaire pour réunir vos textes et vos photos. Je vous donne un calendrier ferme au moment du devis.',
+  },
+  {
+    question: "Que se passe-t-il si je n'ai ni textes ni photos ?",
+    answer:
+      "C'est le cas le plus courant. Je vous accompagne pour structurer et rédiger les textes, et je vous oriente vers un photographe local si les visuels manquent. Un site vitrine ne vaut que par la qualité de ce qu'il montre.",
+  },
+  {
+    question: 'Pourrai-je modifier mon site moi-même ?',
+    answer:
+      'Oui. À la livraison, je vous forme aux modifications courantes : horaires, tarifs, textes, nouvelles photos. Pour les évolutions plus lourdes, je reste joignable.',
+  },
+  {
+    question: 'Le référencement local est-il inclus ?',
+    answer:
+      "Oui, il fait partie du travail, pas d'une option : structure technique propre, données structurées, contenus orientés sur vos prestations et votre secteur, et mise en cohérence de votre fiche Google Business.",
+  },
+  {
+    question: 'Y a-t-il un abonnement mensuel ?',
+    answer:
+      "Aucun abonnement obligatoire. Vous êtes propriétaire de votre site et de votre nom de domaine. L'hébergement et le domaine de la première année sont inclus ; ensuite, vous choisissez de les gérer vous-même ou de me confier la maintenance.",
+  },
+  {
+    question: 'Travaillez-vous uniquement à Roanne ?',
+    answer:
+      "Je suis basé près de Roanne et j'intervienne volontiers dans toute la Loire, en rendez-vous sur place. Au-delà du département, le travail se fait à distance, sans que cela change quoi que ce soit au résultat.",
+  },
+];
+---
+
+<section id="faq" class="border-b border-carbon/10">
+  <div
+    class="mx-auto max-w-[1600px] px-6 py-24 md:px-10 lg:grid lg:grid-cols-[1fr_2fr] lg:gap-20 lg:px-16 lg:py-32 xl:px-24"
+  >
+    {/* --- Titre de section, au même gabarit que les autres H2 --- */}
+    <h2
+      data-anim
+      class="font-display text-[clamp(2rem,4.5vw,3.5rem)] font-bold leading-[1.05] tracking-[-0.03em] text-carbon"
+    >
+      Questions Fréquentes.
+    </h2>
+
+    {/* --- Liste d'accordéons, séparés par des filets horizontaux fins --- */}
+    <div class="mt-12 border-t border-carbon/10 lg:mt-0">
+      {
+        faqItems.map((item) => (
+          <details data-faq class="group border-b border-carbon/10">
+            {/* Question — cliquable sur toute la largeur */}
+            <summary
+              class="flex cursor-pointer list-none items-center justify-between gap-8 py-7 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent [&::-webkit-details-marker]:hidden"
+            >
+              <h3 class="font-display text-base font-semibold leading-snug text-carbon md:text-lg">
+                {item.question}
+              </h3>
+
+              {/* Symbole « + » en deux filets fins : pivote de 45° (devient
+                  « × ») et passe en accent à l'ouverture. Purement décoratif,
+                  l'état est déjà porté par <details>. */}
+              <span
+                aria-hidden="true"
+                class="relative flex h-6 w-6 shrink-0 items-center justify-center text-carbon transition-[rotate,color] duration-300 group-open:rotate-45 group-open:text-accent"
+              >
+                <span class="absolute h-px w-4 bg-current" />
+                <span class="absolute h-4 w-px bg-current" />
+              </span>
+            </summary>
+
+            {/* Réponse — `overflow-hidden` requis : c'est la hauteur de ce
+                bloc que GSAP anime. */}
+            <div data-faq-content class="overflow-hidden">
+              <p class="max-w-2xl pb-8 font-body text-base leading-relaxed text-carbon/70">
+                {item.answer}
+              </p>
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>

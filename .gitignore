@@ -1,0 +1,22 @@
+# Build
+dist/
+.output/
+.vercel/
+
+# Dépendances
+node_modules/
+
+# Cache Astro
+.astro/
+
+# Variables d'environnement (la clé Web3Forms ne doit jamais être versionnée)
+.env
+.env.production
+
+# Logs
+*.log
+npm-debug.log*
+
+# Système
+.DS_Store
+Thumbs.db

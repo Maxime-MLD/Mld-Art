@@ -1,0 +1,77 @@
+---
+/* =========================================================================
+   Hero.astro — Section d'ouverture
+   Grille asymétrique 45 / 55 séparée par un filet vertical fin.
+   Mobile : colonne unique, le visuel remonte au-dessus du texte et le filet
+   vertical devient horizontal.
+   ========================================================================= */
+
+import { Image } from 'astro:assets';
+
+/* --- VISUEL D'OUVERTURE ---
+   Importé depuis src/assets pour être optimisé par astro:assets (WebP +
+   tailles multiples), ce qui compte directement pour le LCP. */
+// TODO: remplacer par le visuel définitif (format vertical, min. 1200 × 1600)
+import heroVisual from '../assets/placeholders/hero.jpg';
+---
+
+<section id="accueil" class="border-b border-carbon/10">
+  <div class="mx-auto grid max-w-[1600px] lg:grid-cols-[45fr_55fr]">
+    {/* ==================================================================
+        COLONNE GAUCHE (45 %) — Titre, sous-texte, CTA principal
+        `order-2` sur mobile : le texte passe sous le visuel.
+        ================================================================== */}
+    <div
+      class="order-2 flex flex-col justify-center px-6 py-20 md:px-10 md:py-24 lg:order-1 lg:px-16 lg:py-32 xl:px-24"
+    >
+      {/* Titre principal — unique H1 de la page, taille fluide */}
+      <h1
+        data-anim
+        class="font-display text-[clamp(2.75rem,6vw,5rem)] font-bold leading-[0.95] tracking-[-0.03em] text-carbon"
+      >
+        L'art du site vitrine.
+      </h1>
+
+      {/* Sous-texte — Inter, mesure courte et aérée */}
+      <p data-anim class="mt-10 max-w-md font-body text-base leading-relaxed text-carbon/70 md:text-lg">
+        Je conçois des sites vitrines sur-mesure pour les artisans et les
+        entreprises de Roanne et de la Loire. Chaque projet est traité comme une
+        pièce unique : design sobre, chargement instantané, référencement local
+        soigné.
+      </p>
+
+      {/* CTA principal — fond accent, texte carbon (contraste AA), angles droits */}
+      <div data-anim class="mt-12">
+        <a
+          href="#contact"
+          class="inline-block bg-accent px-8 py-4 font-body text-xs font-medium uppercase tracking-[0.18em] text-carbon transition-colors duration-300 hover:bg-carbon hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          Démarrer un projet
+        </a>
+      </div>
+    </div>
+
+    {/* ==================================================================
+        COLONNE DROITE (55 %) — Grand visuel vertical
+        Filet vertical à gauche en desktop (`lg:border-l`), filet horizontal
+        en dessous sur mobile (`border-b`), puisque le visuel passe au-dessus.
+        ================================================================== */}
+    <div
+      class="order-1 border-b border-carbon/10 px-6 py-12 md:px-10 lg:order-2 lg:border-b-0 lg:border-l lg:px-16 lg:py-32 xl:px-24"
+    >
+      {/* Cadre : filet fin anthracite + overflow-hidden pour que la bordure
+          reste immobile lors des futurs micro-zooms */}
+      <div class="overflow-hidden border border-carbon/20">
+        <Image
+          src={heroVisual}
+          alt="Aperçu d'un site vitrine réalisé par MLD DEV, présenté en format vertical"
+          widths={[600, 900, 1200]}
+          sizes="(min-width: 1024px) 55vw, 100vw"
+          loading="eager"
+          fetchpriority="high"
+          class="block aspect-[3/4] w-full object-cover"
+        />
+      </div>
+    </div>
+  </div>
+</section>

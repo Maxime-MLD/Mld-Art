@@ -1,0 +1,96 @@
+---
+/* =========================================================================
+   Services.astro — « L'Atelier »
+   Colonnes épurées séparées par des filets verticaux fins (cartels de musée).
+   Sur mobile, les colonnes s'empilent et les filets deviennent horizontaux.
+   ========================================================================= */
+
+import ServiceCard from './ServiceCard.astro';
+
+/* --- DONNÉES : les prestations ---
+   L'accent orange alterne d'une carte à l'autre : prix, puces, prix. */
+// TODO: ajuster les intitulés, les tarifs réels et le détail des prestations
+const services = [
+  {
+    title: 'La Carte de Visite',
+    description:
+      "Une page unique, dense et rapide, pour exister sur le web sans détour : qui vous êtes, ce que vous faites, comment vous joindre.",
+    price: 'dès 690 €', // TODO: tarif réel
+    features: [
+      'Site une page, sur-mesure',
+      'Fiche Google Business optimisée',
+      'Formulaire de contact sécurisé',
+      'Hébergement et nom de domaine la première année',
+    ],
+    accent: 'price' as const,
+  },
+  {
+    title: 'Le Site Vitrine',
+    description:
+      'La formule complète : plusieurs pages, un référencement local travaillé et une vraie direction artistique au service de votre métier.',
+    price: 'dès 1 490 €', // TODO: tarif réel
+    features: [
+      'Jusqu’à six pages sur-mesure',
+      'Référencement local Roanne & Loire',
+      'Rédaction des textes accompagnée',
+      'Conformité RGPD et mentions légales',
+      'Formation à la mise à jour du contenu',
+    ],
+    accent: 'features' as const,
+  },
+  {
+    title: 'La Refonte',
+    description:
+      "Votre site existe mais il vous dessert : lent, daté, invisible. On repart de la structure pour tout remettre d'aplomb.",
+    price: 'sur devis', // TODO: tarif réel
+    features: [
+      'Audit technique et de performance',
+      'Reprise de la structure et des contenus',
+      'Redirections et maintien du positionnement',
+      'Suivi trois mois après la mise en ligne',
+    ],
+    accent: 'price' as const,
+  },
+];
+---
+
+<section id="services" class="border-b border-carbon/10">
+  {/* --- En-tête de section --- */}
+  <div class="mx-auto max-w-[1600px] px-6 pt-24 pb-16 md:px-10 lg:px-16 lg:pt-32 lg:pb-20 xl:px-24">
+    <h2
+      data-anim
+      class="font-display text-[clamp(2rem,4.5vw,3.5rem)] font-bold leading-[1.05] tracking-[-0.03em] text-carbon"
+    >
+      L'Atelier.
+    </h2>
+  </div>
+
+  {/* --- Colonnes de prestations ---
+      Les filets sont obtenus par une gouttière de 1px (`gap-px`) laissant
+      voir le fond `carbon/10` du conteneur : les lignes restent justes à
+      tous les breakpoints, sans doublon ni filet orphelin.
+      1 colonne en mobile, 2 en tablette, 3 en desktop. */}
+  <div class="border-t border-carbon/10">
+    <div
+      class:list={[
+        'mx-auto grid max-w-[1600px] gap-px bg-carbon/10 md:grid-cols-2 lg:grid-cols-3',
+        /* Nombre impair de cartes : la dernière occupe toute la largeur en
+           tablette, sinon une case vide laisserait un aplat carbon/10. */
+        services.length % 2 === 1 &&
+          'md:[&>*:last-child]:col-span-2 lg:[&>*:last-child]:col-span-1',
+      ]}
+    >
+      {
+        services.map((service) => (
+          <ServiceCard
+            title={service.title}
+            description={service.description}
+            price={service.price}
+            features={service.features}
+            accent={service.accent}
+          />
+        ))
+      }
+    </div>
+  </div>
+</section>

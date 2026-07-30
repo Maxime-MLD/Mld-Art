@@ -1,0 +1,83 @@
+---
+/* =========================================================================
+   ServiceCard.astro — Une prestation, présentée comme un cartel de musée
+   Usage chirurgical de l'orange : chaque carte ne porte l'accent QUE sur un
+   seul élément, le prix OU les puces de validation — jamais les deux.
+   ========================================================================= */
+
+interface Props {
+  title: string;
+  description: string;
+  price: string;
+  features: string[];
+  /* Élément qui porte l'accent orange dans cette carte.
+     L'orange en texte sur fond papier ne dépasse pas 2,47:1 (échec WCAG AA) :
+     sur le prix, l'accent est donc appliqué en aplat avec un texte carbon
+     (5,93:1). Sur les puces, il reste en couleur — ce sont des marqueurs
+     décoratifs, dont le sens est porté par le texte adjacent. */
+  accent?: 'price' | 'features';
+}
+
+const { title, description, price, features, accent = 'price' } = Astro.props;
+
+const accentOnPrice = accent === 'price';
+---
+
+{/* `bg-paper` est indispensable : la grille parente laisse apparaître son
+   fond `carbon/10` dans les gouttières de 1px, ce qui dessine les filets.
+   Le padding horizontal reprend celui des sections pour que le titre de la
+   première colonne s'aligne exactement sur le H2 de la section. */}
+<article class="flex flex-col bg-paper px-6 py-12 md:px-10 md:py-14 lg:px-16 lg:py-16 xl:px-24">
+  {/* --- Intitulé de la prestation --- */}
+  <h3 class="font-display text-2xl font-bold leading-tight tracking-[-0.02em] text-carbon">
+    {title}
+  </h3>
+
+  {/* --- Description --- */}
+  <p class="mt-5 font-body text-base leading-relaxed text-carbon/70">
+    {description}
+  </p>
+
+  {/* --- Prix ---
+      Variante accentuée : aplat orange, texte carbon.
+      Variante sobre : texte carbon, l'accent est réservé aux puces. */}
+  <div class="mt-10">
+    {
+      accentOnPrice ? (
+        <p class="inline-block bg-accent px-4 py-2 font-display text-2xl font-bold tracking-tight text-carbon">
+          {price}
+        </p>
+      ) : (
+        <p class="font-display text-2xl font-bold tracking-tight text-carbon">
+          {price}
+        </p>
+      )
+    }
+  </div>
+
+  {/* --- Détail de la prestation, séparé par un filet fin --- */}
+  <ul class="mt-10 space-y-4 border-t border-carbon/10 pt-8">
+    {
+      features.map((feature) => (
+        <li class="flex gap-3 font-body text-sm leading-relaxed text-carbon/80">
+          {/* Puce de validation — marqueur décoratif, angles nets */}
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 12 12"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="square"
+            class:list={[
+              'mt-[5px] h-3 w-3 shrink-0',
+              accentOnPrice ? 'text-carbon/30' : 'text-accent',
+            ]}
+          >
+            <path d="M1.5 6.5 4.5 9.5 10.5 2.5" />
+          </svg>
+          <span>{feature}</span>
+        </li>
+      ))
+    }
+  </ul>
+</article>

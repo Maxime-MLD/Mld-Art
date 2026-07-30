@@ -1,0 +1,98 @@
+---
+/* =========================================================================
+   Layout.astro — Layout principal du site
+   Contient : le <head> complet (SEO local Roanne), les polices auto-hébergées
+   via @fontsource, la feuille de styles globale, et l'initialisation
+   du smooth scroll Lenis / GSAP.
+   ========================================================================= */
+
+/* --- POLICES AUTO-HÉBERGÉES (@fontsource, sous-set latin uniquement) -------
+   Jamais le CDN Google Fonts : aucune requête tierce (meilleur LCP) et aucun
+   transfert d'IP hors UE (conformité RGPD / recommandation CNIL). ---------- */
+/* NB : Plus Jakarta Sans plafonne à la graisse 800 (ExtraBold) — la fonte
+   n'existe pas en 900 (Black). 800 est donc notre graisse la plus lourde,
+   utilisée pour le logo et le watermark. */
+import '@fontsource/plus-jakarta-sans/latin-700.css'; /* Titres — Bold */
+import '@fontsource/plus-jakarta-sans/latin-800.css'; /* Logo & watermark — ExtraBold */
+import '@fontsource/inter/latin-400.css';             /* Corps de texte — Regular */
+import '@fontsource/inter/latin-500.css';             /* Labels & liens — Medium */
+/* Italique réel : sans lui, le navigateur simule une pente (faux italique),
+   ce qui se voit sur les secteurs d'activité des réalisations. */
+import '@fontsource/inter/latin-400-italic.css';      /* Secteurs, mentions — Italic */
+
+/* --- STYLES GLOBAUX (tokens @theme + base) ------------------------------- */
+import '../styles/global.css';
+
+/* --- PROPS DU LAYOUT ----------------------------------------------------- */
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'MLD DEV — Création de sites vitrines à Roanne (Loire)',
+  description =
+    'MLD DEV, studio de création de sites vitrines à Roanne (Loire, 42). Des sites sur-mesure, rapides et soignés, pensés pour les artisans et entreprises locales.',
+} = Astro.props;
+
+/* --- URL CANONIQUE ------------------------------------------------------- */
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+/* --- IMAGE DE PARTAGE (Open Graph / Twitter) ----------------------------- */
+/* TODO: remplacer par le visuel de partage définitif (1200 × 630 px) */
+const ogImage = new URL('/placeholders/og-image.jpg', Astro.site);
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    {/* --- Métadonnées techniques de base --- */}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+
+    {/* --- SEO principal --- */}
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    {/* --- Open Graph (Facebook, LinkedIn, WhatsApp…) --- */}
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:site_name" content="MLD DEV" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImage} />
+
+    {/* --- Twitter Card --- */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    {/* --- Géolocalisation (Roanne, Loire — FR-42) ---
+        Note : ces balises ne sont plus exploitées par Google ; elles sont
+        conservées par cohérence et ne remplacent pas le JSON-LD. --- */}
+    <meta name="geo.region" content="FR-42" />
+    <meta name="geo.placename" content="Roanne" />
+    <meta name="geo.position" content="46.0368;4.0689" />
+    <meta name="ICBM" content="46.0368, 4.0689" />
+
+    {/* --- Favicon --- */}
+    {/* TODO: remplacer par le favicon définitif */}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    {/* TODO (Phase 8) : script JSON-LD ProfessionalService (SEO local) */}
+  </head>
+
+  <body class="bg-paper font-body text-carbon antialiased">
+    {/* Le contenu de chaque page est injecté ici */}
+    <slot />
+
+    {/* --- Animations : smooth scroll Lenis + GSAP (fichier unique) --- */}
+    <script>
+      import '../scripts/animations.js';
+    </script>
+  </body>
+</html>

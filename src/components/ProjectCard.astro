@@ -1,0 +1,101 @@
+---
+/* =========================================================================
+   ProjectCard.astro — Une réalisation, présentée seule (jamais en grille)
+   Visuel 60 % / texte 40 %, alternance gauche-droite pilotée par `isReversed`.
+   Le filet horizontal supérieur assure la séparation pleine largeur entre
+   deux projets consécutifs.
+   ========================================================================= */
+
+import { Image } from 'astro:assets';
+
+interface Props {
+  title: string;
+  category: string;
+  description: string;
+  imageSrc: ImageMetadata;
+  imageAlt: string;
+  projectUrl: string;
+  isReversed?: boolean;
+}
+
+const {
+  title,
+  category,
+  description,
+  imageSrc,
+  imageAlt,
+  projectUrl,
+  isReversed = false,
+} = Astro.props;
+---
+
+<article class="border-t border-carbon/10">
+  {/* La colonne du visuel fait toujours 60 % : quand l'ordre est inversé, on
+      inverse aussi le gabarit de grille, sinon l'image passerait à 40 %. */}
+  <div
+    class:list={[
+      'mx-auto grid max-w-[1600px] gap-10 px-6 py-16 md:px-10 md:py-20 lg:items-center lg:gap-20 lg:px-16 lg:py-28 xl:px-24',
+      isReversed ? 'lg:grid-cols-[40fr_60fr]' : 'lg:grid-cols-[60fr_40fr]',
+    ]}
+  >
+    {/* ==================================================================
+        VISUEL (60 %) — toujours premier dans le DOM, donc toujours au-dessus
+        du texte sur mobile, quel que soit `isReversed`.
+        ================================================================== */}
+    <div
+      class:list={[
+        'overflow-hidden border border-carbon/20',
+        isReversed ? 'lg:order-2' : 'lg:order-1',
+      ]}
+    >
+      {/* `data-project-image` : cible du micro-zoom au survol (Phase 7) */}
+      <Image
+        src={imageSrc}
+        alt={imageAlt}
+        widths={[600, 900, 1400]}
+        sizes="(min-width: 1024px) 60vw, 100vw"
+        loading="lazy"
+        data-project-image
+        class="block aspect-[4/3] w-full object-cover"
+      />
+    </div>
+
+    {/* ==================================================================
+        TEXTE (40 %)
+        ================================================================== */}
+    <div
+      class:list={[
+        'flex flex-col',
+        isReversed ? 'lg:order-1' : 'lg:order-2',
+      ]}
+    >
+      {/* Secteur d'activité — italique discret, façon cartel de musée.
+          Opacité 65 % : c'est le palier le plus discret qui tienne le
+          contraste AA à cette taille (5,03:1 ; 50 % tombait à 3,20:1). */}
+      <p class="font-body text-sm italic text-carbon/65">{category}</p>
+
+      {/* Titre du projet */}
+      <h3 class="mt-4 font-display text-[clamp(1.75rem,2.6vw,2.5rem)] font-bold leading-[1.1] tracking-[-0.02em] text-carbon">
+        {title}
+      </h3>
+
+      {/* Description courte — axée design & performance */}
+      <p class="mt-6 max-w-md font-body text-base leading-relaxed text-carbon/70">
+        {description}
+      </p>
+
+      {/* Lien de visite — filet de soulignement qui passe à l'orange au survol */}
+      <div class="mt-10">
+        <a
+          href={projectUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Visiter le site de ${title} (nouvelle fenêtre)`}
+          class="inline-block border-b border-carbon pb-1 font-body text-sm font-medium text-carbon transition-colors duration-300 hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          Visiter le site
+        </a>
+      </div>
+    </div>
+  </div>
+</article>

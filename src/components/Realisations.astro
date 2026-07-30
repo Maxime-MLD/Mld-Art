@@ -1,0 +1,78 @@
+---
+/* =========================================================================
+   Realisations.astro — Portfolio
+   Les projets sont présentés un par un, en alternance gauche/droite.
+   ========================================================================= */
+
+import ProjectCard from './ProjectCard.astro';
+
+/* --- VISUELS DES PROJETS ---
+   Importés depuis src/assets pour être optimisés par astro:assets. */
+// TODO: remplacer par les captures définitives des sites livrés
+import projet01 from '../assets/placeholders/projet-01.jpg';
+import projet02 from '../assets/placeholders/projet-02.jpg';
+import projet03 from '../assets/placeholders/projet-03.jpg';
+
+/* --- DONNÉES : les réalisations ---
+   L'alternance image gauche / image droite est calculée à l'affichage. */
+// TODO: remplacer par les vrais projets (titre, secteur, description, URL)
+const projects = [
+  {
+    title: 'Denis Soudure',
+    category: 'Métallerie & soudure — Vougy',
+    description:
+      'Un site vitrine sobre pour un atelier de métallerie : mise en avant des réalisations en grand format, contact accessible en un geste, et un chargement sous la seconde même en 4G.',
+    imageSrc: projet01,
+    imageAlt:
+      "Page d'accueil du site vitrine de l'atelier de métallerie Denis Soudure",
+    projectUrl: '#', // TODO: URL réelle du projet
+  },
+  {
+    title: 'Salon Éclat',
+    category: 'Coiffure & esthétique — Roanne',
+    description:
+      "Une identité claire et lumineuse pour un salon du centre-ville : prise de rendez-vous mise en avant dès l'écran d'accueil, tarifs lisibles, et une fiche Google enfin cohérente avec le site.",
+    imageSrc: projet02,
+    imageAlt: 'Page de présentation des prestations du Salon Éclat à Roanne',
+    projectUrl: '#', // TODO: URL réelle du projet
+  },
+  {
+    title: 'Cabinet du Coteau',
+    category: 'Cabinet dentaire — Le Coteau',
+    description:
+      "Un site rassurant et strictement conforme au RGPD : informations pratiques immédiatement trouvables, formulaire sécurisé, et un score d'accessibilité de 100 sur 100.",
+    imageSrc: projet03,
+    imageAlt: "Page d'accueil du site du cabinet dentaire du Coteau",
+    projectUrl: '#', // TODO: URL réelle du projet
+  },
+];
+---
+
+<section id="realisations" class="border-b border-carbon/10">
+  {/* --- En-tête de section --- */}
+  <div class="mx-auto max-w-[1600px] px-6 pt-24 pb-16 md:px-10 lg:px-16 lg:pt-32 lg:pb-20 xl:px-24">
+    <h2
+      data-anim
+      class="font-display text-[clamp(2rem,4.5vw,3.5rem)] font-bold leading-[1.05] tracking-[-0.03em] text-carbon"
+    >
+      Les Réalisations.
+    </h2>
+  </div>
+
+  {/* --- Liste des projets ---
+      Chaque carte porte son filet horizontal supérieur : la séparation entre
+      deux projets est donc pleine largeur. */}
+  {
+    projects.map((project, index) => (
+      <ProjectCard
+        title={project.title}
+        category={project.category}
+        description={project.description}
+        imageSrc={project.imageSrc}
+        imageAlt={project.imageAlt}
+        projectUrl={project.projectUrl}
+        isReversed={index % 2 === 1}
+      />
+    ))
+  }
+</section>

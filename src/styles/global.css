@@ -1,0 +1,122 @@
+/* =========================================================================
+   MLD DEV — Feuille de styles globale
+   Tailwind CSS 4 : les tokens de design se déclarent ici, dans @theme.
+   Aucun tailwind.config.js dans ce projet.
+   ========================================================================= */
+
+@import "tailwindcss";
+
+/* -------------------------------------------------------------------------
+   TOKENS DE DESIGN
+   Génèrent automatiquement les classes : bg-paper, text-carbon,
+   border-accent, font-display, font-body, etc.
+   Règle 60 / 30 / 10 : paper (fond) / carbon (texte & structure) / accent.
+   ------------------------------------------------------------------------- */
+@theme {
+  --color-paper:  #EDEBE9;  /* Fond principal (60 %) — papier-lin haut de gamme */
+  --color-carbon: #1A1A1A;  /* Texte & structure (30 %) — carbone mat, jamais de noir pur */
+  --color-accent: #FF6600;  /* Accent (10 %) — uniquement les actions clés */
+
+  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-body:    "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* -------------------------------------------------------------------------
+   STYLES DE BASE
+   ------------------------------------------------------------------------- */
+@layer base {
+  /* Le smooth scroll est géré par Lenis en JS : on désactive celui du navigateur
+     pour éviter les deux mécaniques en conflit. */
+  html {
+    scroll-behavior: auto;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-carbon);
+    font-family: var(--font-body);
+    font-weight: 400;
+    /* Rendu typographique soigné : c'est la précision qui fait la DA */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Titres : Plus Jakarta Sans, crénage resserré, pas d'interlignage flottant */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  /* Sélection texte : accent discret, texte en carbon (contraste AA) */
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-carbon);
+  }
+
+  /* Focus clavier visible partout — exigence d'accessibilité non négociable */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  /* Filets de structure : angles droits, aucun arrondi parasite */
+  hr {
+    border-color: color-mix(in srgb, var(--color-carbon) 10%, transparent);
+    border-top-width: 1px;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   LENIS — styles requis par le smooth scroll
+   (repris de la doc officielle : sans ça, le scroll se bloque)
+   ------------------------------------------------------------------------- */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* -------------------------------------------------------------------------
+   ACCESSIBILITÉ — préférence « animations réduites »
+   État final immédiat : aucune animation d'entrée, aucun smooth scroll.
+   ------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Les éléments préparés pour une animation d'entrée sont affichés d'emblée */
+  [data-anim],
+  [data-anim-line] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   ÉTAT INITIAL DES ANIMATIONS
+   Déclaré en CSS pour éviter tout flash de contenu non animé (FOUC)
+   avant l'initialisation de GSAP. Complété en Phase 7.
+   ------------------------------------------------------------------------- */
+[data-anim] {
+  opacity: 0;
+}

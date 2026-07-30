@@ -1,0 +1,154 @@
+---
+/* =========================================================================
+   Navbar.astro — Barre de navigation principale
+   Structure : logo à gauche · liens au centre · CTA à droite.
+   Sur mobile : bouton burger (deux traits fins qui se croisent) + menu
+   plein écran sur fond papier.
+   ========================================================================= */
+
+/* --- DONNÉES : liens de navigation ---
+   « À Propos » pointe sur le Manifeste, qui tient ce rôle sur la page. */
+const navLinks = [
+  { label: 'Services', href: '#services' },
+  { label: 'Réalisations', href: '#realisations' },
+  { label: 'À Propos', href: '#manifeste' },
+];
+---
+
+<header class="sticky top-0 z-50 border-b border-carbon/10 bg-paper">
+  <nav
+    aria-label="Navigation principale"
+    class="mx-auto grid h-20 max-w-[1600px] grid-cols-[1fr_auto] items-center px-6 md:px-10 lg:h-24 lg:grid-cols-[1fr_auto_1fr] lg:px-16 xl:px-24"
+  >
+    {/* --- LOGO : « MLD DEV. », point final en accent --- */}
+    <a
+      href="/"
+      aria-label="MLD DEV — retour à l'accueil"
+      class="justify-self-start font-display text-lg font-extrabold tracking-tight text-carbon transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent lg:text-xl"
+    >
+      MLD DEV<span class="text-accent">.</span>
+    </a>
+
+    {/* --- LIENS CENTRAUX (desktop uniquement) --- */}
+    <ul class="hidden justify-self-center lg:flex lg:items-center lg:gap-12">
+      {
+        navLinks.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="font-body text-sm font-medium text-carbon transition-colors duration-300 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    {/* --- CTA SECONDAIRE (desktop) : bordure fine, fond transparent --- */}
+    <a
+      href="#contact"
+      class="hidden justify-self-end border border-carbon px-6 py-3 font-body text-xs font-medium uppercase tracking-[0.18em] text-carbon transition-colors duration-300 hover:bg-carbon hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent lg:inline-block"
+    >
+      Me contacter
+    </a>
+
+    {/* --- BOUTON BURGER (mobile) : deux traits fins qui se croisent --- */}
+    <button
+      id="nav-burger"
+      type="button"
+      aria-expanded="false"
+      aria-controls="nav-mobile"
+      aria-label="Ouvrir le menu"
+      class="group flex h-11 w-11 flex-col items-center justify-center justify-self-end focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent lg:hidden"
+    >
+      <span
+        class="block h-px w-7 bg-carbon transition-transform duration-300 group-aria-expanded:translate-y-[4px] group-aria-expanded:rotate-45"
+      ></span>
+      <span
+        class="mt-[7px] block h-px w-7 bg-carbon transition-transform duration-300 group-aria-expanded:-translate-y-[4px] group-aria-expanded:-rotate-45"
+      ></span>
+    </button>
+  </nav>
+
+  {/* --- MENU MOBILE PLEIN ÉCRAN ---
+      Passe sous la barre (z-40 < z-50) pour que le logo et le burger
+      restent visibles et cliquables. */}
+  <div id="nav-mobile" hidden class="fixed inset-0 z-40 bg-paper lg:hidden">
+    <ul class="flex h-full flex-col justify-center gap-10 px-6 pb-20 md:px-10 lg:px-16 xl:px-24">
+      {
+        navLinks.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="font-display text-4xl font-bold tracking-tight text-carbon transition-colors duration-300 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+
+      {/* CTA en bas de pile, traité comme les autres liens mais souligné d'un filet */}
+      <li class="mt-6 border-t border-carbon/10 pt-10">
+        <a
+          href="#contact"
+          class="font-display text-4xl font-bold tracking-tight text-carbon transition-colors duration-300 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          Me contacter<span class="text-accent">.</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<script>
+  /* -----------------------------------------------------------------------
+     Ouverture / fermeture du menu mobile
+     L'état est porté par `aria-expanded` sur le burger : c'est lui qui
+     pilote à la fois l'accessibilité et l'animation des deux traits (CSS).
+     ----------------------------------------------------------------------- */
+  const burger = document.getElementById('nav-burger');
+  const panel = document.getElementById('nav-mobile');
+
+  if (burger && panel) {
+    const setMenu = (isOpen: boolean) => {
+      burger.setAttribute('aria-expanded', String(isOpen));
+      burger.setAttribute('aria-label', isOpen ? 'Fermer le menu' : 'Ouvrir le menu');
+      panel.hidden = !isOpen;
+
+      /* Verrouillage du scroll : Lenis d'abord (smooth scroll actif),
+         `overflow-hidden` en secours si Lenis est désactivé
+         (préférence « animations réduites »). */
+      if (isOpen) {
+        window.lenis?.stop();
+      } else {
+        window.lenis?.start();
+      }
+      document.documentElement.classList.toggle('overflow-hidden', isOpen);
+    };
+
+    /* Clic sur le burger : on inverse l'état courant */
+    burger.addEventListener('click', () => {
+      setMenu(burger.getAttribute('aria-expanded') !== 'true');
+    });
+
+    /* Clic sur un lien du menu : on referme avant de naviguer vers l'ancre */
+    panel.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => setMenu(false));
+    });
+
+    /* Touche Échap : fermeture et retour du focus sur le burger */
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !panel.hidden) {
+        setMenu(false);
+        burger.focus();
+      }
+    });
+
+    /* Passage en desktop alors que le menu est ouvert : on referme */
+    window.matchMedia('(min-width: 1024px)').addEventListener('change', (event) => {
+      if (event.matches) setMenu(false);
+    });
+  }
+</script>

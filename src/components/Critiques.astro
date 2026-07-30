@@ -1,0 +1,235 @@
+---
+/* =========================================================================
+   Critiques.astro — Avis clients
+   Carrousel de cartes défilantes : flèches gauche / droite en aplat orange
+   et filets de pagination entre les deux, indiquant le nombre de pages.
+   Le défilement repose sur `scroll-snap` natif : accessible au clavier,
+   fonctionnel même si le JS ne se charge pas.
+   Aucune étoile, aucun avatar, aucune ombre portée.
+   ========================================================================= */
+
+/* --- DONNÉES : les avis --- */
+// TODO: remplacer par les avis réels (Google Business), avec accord des clients
+const reviews = [
+  {
+    quote:
+      'Maxime a compris mon métier avant de parler design. Le site est sobre, rapide, et je reçois enfin des demandes de devis par le formulaire.',
+    author: 'Denis M.',
+    activity: 'Métallier — Vougy',
+  },
+  {
+    quote:
+      "Trois semaines entre le premier échange et la mise en ligne. Aucun jargon, des réponses claires, et un résultat très au-dessus de ce que j'imaginais.",
+    author: 'Claire B.',
+    activity: 'Salon de coiffure — Roanne',
+  },
+  {
+    quote:
+      'Notre ancien site mettait huit secondes à s’afficher. Le nouveau est instantané, et nous sommes remontés dans les recherches locales.',
+    author: 'L. Fauvel',
+    activity: 'Cabinet dentaire — Le Coteau',
+  },
+  {
+    quote:
+      "Ce qui m'a marqué, c'est le soin apporté aux détails : les espacements, les photos recadrées, les textes retravaillés. Le site nous ressemble.",
+    author: 'Sophie R.',
+    activity: 'Fleuriste — Riorges',
+  },
+  {
+    quote:
+      'Un interlocuteur unique du début à la fin, joignable, qui explique ce qu’il fait et pourquoi. Le devis annoncé a été le devis payé.',
+    author: 'Julien P.',
+    activity: 'Paysagiste — Mably',
+  },
+  {
+    quote:
+      'Nous étions invisibles sur Google en dehors de notre nom. Six mois après la mise en ligne, nous sortons sur nos deux principales prestations.',
+    author: 'Nathalie C.',
+    activity: 'Institut de beauté — Roanne',
+  },
+];
+---
+
+<section id="critiques" class="border-b border-carbon/10">
+  <div class="mx-auto max-w-[1600px] px-6 py-24 md:px-10 lg:px-16 lg:py-32 xl:px-24">
+    {/* ==================================================================
+        EN-TÊTE — titre aligné sur les autres sections
+        ================================================================== */}
+    <h2
+      data-anim
+      class="font-display text-[clamp(2rem,4.5vw,3.5rem)] font-bold leading-[1.05] tracking-[-0.03em] text-carbon"
+    >
+      Les Critiques.
+    </h2>
+
+    {/* ==================================================================
+        PISTE DÉFILANTE
+        `data-lenis-prevent` : sans lui, Lenis capterait la molette et le
+        défilement horizontal interne serait inopérant.
+        ================================================================== */}
+    <div
+      id="critiques-track"
+      tabindex="0"
+      role="group"
+      aria-roledescription="carrousel"
+      aria-label="Avis de clients — liste défilante horizontalement"
+      data-lenis-prevent
+      class="mt-16 flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    >
+      {
+        reviews.map((review) => (
+          <figure class="flex w-full shrink-0 snap-start flex-col border border-carbon/20 p-8 md:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-3rem)/3)] lg:p-10">
+            {/* Citation — Inter Regular, aucune emphase superflue */}
+            <blockquote class="font-body text-base leading-relaxed font-normal text-carbon/80">
+              « {review.quote} »
+            </blockquote>
+
+            {/* Attribution — petites majuscules, poussée en bas de carte.
+                Opacité 65 % : palier minimal tenant le contraste AA à 12px. */}
+            <figcaption class="mt-10 font-body text-xs uppercase tracking-wider text-carbon/65">
+              <span class="text-carbon">{review.author}</span>
+              <span aria-hidden="true"> · </span>
+              {review.activity}
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+
+    {/* ==================================================================
+        COMMANDES DU CARROUSEL — centrées sous les avis
+        Écarts resserrés en mobile : une page par carte y donne six filets,
+        qui ne tiendraient pas dans la largeur avec les écarts du desktop.
+        ================================================================== */}
+    <div class="mt-14 flex items-center justify-center gap-3 md:gap-6">
+        {/* Flèche précédente */}
+        <button
+          id="critiques-prev"
+          type="button"
+          aria-label="Avis précédents"
+          aria-controls="critiques-track"
+          class="flex h-11 w-11 shrink-0 items-center justify-center bg-accent text-carbon transition-colors duration-300 hover:bg-carbon hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-30"
+        >
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="square"
+            class="h-4 w-4"
+          >
+            <path d="M10 2.5 4.5 8l5.5 5.5" />
+          </svg>
+        </button>
+
+        {/* Filets de pagination — un trait par page.
+            Les traits en surnombre sont masqués en JS selon le breakpoint. */}
+        <div id="critiques-pagination" class="flex items-center gap-1 md:gap-2">
+          {
+            reviews.map((_, index) => (
+              <button
+                type="button"
+                data-page={index}
+                aria-label={`Aller à la page ${index + 1}`}
+                class="group flex h-11 w-6 shrink-0 items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:w-8"
+              >
+                {/* Trait fin : carbon plein pour la page courante, carbon/20 sinon */}
+                <span
+                  class="block h-px w-4 bg-carbon/20 transition-colors duration-300 group-hover:bg-carbon/50 group-aria-[current=true]:bg-carbon md:w-6"
+                />
+              </button>
+            ))
+          }
+        </div>
+
+        {/* Flèche suivante */}
+        <button
+          id="critiques-next"
+          type="button"
+          aria-label="Avis suivants"
+          aria-controls="critiques-track"
+          class="flex h-11 w-11 shrink-0 items-center justify-center bg-accent text-carbon transition-colors duration-300 hover:bg-carbon hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-30"
+        >
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="square"
+            class="h-4 w-4"
+          >
+            <path d="M6 2.5 11.5 8 6 13.5" />
+          </svg>
+        </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  /* -----------------------------------------------------------------------
+     Carrousel des avis
+     Le défilement se fait page par page : une page = la largeur visible de
+     la piste. Le nombre de cartes visibles étant défini en CSS (1 / 2 / 3),
+     le nombre de pages se recalcule à chaque redimensionnement.
+     ----------------------------------------------------------------------- */
+  const track = document.getElementById('critiques-track');
+  const prevButton = document.getElementById('critiques-prev') as HTMLButtonElement | null;
+  const nextButton = document.getElementById('critiques-next') as HTMLButtonElement | null;
+  const pagination = document.getElementById('critiques-pagination');
+
+  if (track && prevButton && nextButton && pagination) {
+    const dots = Array.from(pagination.querySelectorAll('button'));
+
+    /* Largeur d'une page : zone visible + gouttière.
+       C'est cette valeur qui fait tomber le défilement pile sur une carte. */
+    const pageWidth = () => {
+      const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+      return track.clientWidth + gap;
+    };
+
+    const pageCount = () => Math.max(1, Math.ceil(track.scrollWidth / pageWidth()));
+    const currentPage = () =>
+      Math.min(pageCount() - 1, Math.round(track.scrollLeft / pageWidth()));
+
+    /* Mise à jour des commandes : traits visibles, page courante,
+       flèches désactivées en début et en fin de piste. */
+    const syncControls = () => {
+      const total = pageCount();
+      const current = currentPage();
+
+      dots.forEach((dot, index) => {
+        dot.hidden = index >= total;
+        dot.setAttribute('aria-current', String(index === current));
+        dot.setAttribute('aria-label', `Aller à la page ${index + 1} sur ${total}`);
+      });
+
+      /* Une seule page : les commandes n'ont plus d'objet */
+      const isSinglePage = total <= 1;
+      pagination.hidden = isSinglePage;
+      prevButton.disabled = isSinglePage || current === 0;
+      nextButton.disabled = isSinglePage || current >= total - 1;
+    };
+
+    /* Défilement d'une page, dans un sens ou dans l'autre */
+    const scrollByPage = (direction: number) => {
+      track.scrollBy({ left: direction * pageWidth(), behavior: 'smooth' });
+    };
+
+    prevButton.addEventListener('click', () => scrollByPage(-1));
+    nextButton.addEventListener('click', () => scrollByPage(1));
+
+    /* Clic sur un trait : saut direct à la page correspondante */
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        track.scrollTo({ left: index * pageWidth(), behavior: 'smooth' });
+      });
+    });
+
+    /* Le défilement manuel (molette, doigt, clavier) met aussi à jour l'état */
+    track.addEventListener('scroll', syncControls, { passive: true });
+    window.addEventListener('resize', syncControls);
+    syncControls();
+  }
+</script>

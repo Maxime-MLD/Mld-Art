@@ -1,0 +1,51 @@
+---
+/* =========================================================================
+   index.astro — Page d'accueil
+   Ordre d'assemblage prévu :
+   Navbar → Hero → Manifeste → Realisations → Services → Critiques → Faq
+   → Contact → Footer.
+   Sections ajoutées au fil des phases.
+   ========================================================================= */
+
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Hero from '../components/Hero.astro';
+import Manifeste from '../components/Manifeste.astro';
+import Realisations from '../components/Realisations.astro';
+import Services from '../components/Services.astro';
+import Critiques from '../components/Critiques.astro';
+import Faq from '../components/Faq.astro';
+import Contact from '../components/Contact.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout>
+  {/* --- Navigation principale --- */}
+  <Navbar />
+
+  <main>
+    {/* --- Section d'ouverture --- */}
+    <Hero />
+
+    {/* --- Phrase de positionnement (ancre « À Propos ») --- */}
+    <Manifeste />
+
+    {/* --- Portfolio --- */}
+    <Realisations />
+
+    {/* --- Prestations --- */}
+    <Services />
+
+    {/* --- Avis clients --- */}
+    <Critiques />
+
+    {/* --- Questions fréquentes --- */}
+    <Faq />
+
+    {/* --- Prise de contact --- */}
+    <Contact />
+  </main>
+
+  {/* --- Pied de page + watermark signature --- */}
+  <Footer />
+</Layout>
