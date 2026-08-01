@@ -1,8 +1,8 @@
 ---
 /* =========================================================================
-   Services.astro — « L'Atelier »
-   Colonnes épurées séparées par des filets verticaux fins (cartels de musée).
-   Sur mobile, les colonnes s'empilent et les filets deviennent horizontaux.
+  Services.astro — « L'Atelier »
+  Colonnes épurées séparées par des filets verticaux fins (cartels de musée).
+  Sur mobile, les colonnes s'empilent et les filets deviennent horizontaux.
    ========================================================================= */
 
 import ServiceCard from './ServiceCard.astro';
@@ -12,56 +12,95 @@ import ServiceCard from './ServiceCard.astro';
 // TODO: ajuster les intitulés, les tarifs réels et le détail des prestations
 const services = [
   {
-    title: 'La Carte de Visite',
+    title: 'Le Site Vitrine',
     description:
-      "Une page unique, dense et rapide, pour exister sur le web sans détour : qui vous êtes, ce que vous faites, comment vous joindre.",
-    price: 'dès 690 €', // TODO: tarif réel
+      "Une page unique, percutante et rapide, pour installer votre présence sur le web. L'essentiel concentré au même endroit, qui vous êtes, ce que vous faites et comment vous contacter pour générer vos premiers clients.",
+    price: '1000 €', // TODO: tarif réel
     features: [
       'Site une page, sur-mesure',
-      'Fiche Google Business optimisée',
+      'Choix du design & couleurs',
+      'Référencement (SEO) local Roanne & Loire',
+      'Rédaction des textes accompagnée',
       'Formulaire de contact sécurisé',
-      'Hébergement et nom de domaine la première année',
+      'Conformité RGPD et mentions légales',
     ],
     accent: 'price' as const,
   },
   {
-    title: 'Le Site Vitrine',
+    title: 'Le Site Vitrine Multipage',
     description:
-      'La formule complète : plusieurs pages, un référencement local travaillé et une vraie direction artistique au service de votre métier.',
-    price: 'dès 1 490 €', // TODO: tarif réel
+      'La formule complète, plusieurs pages pour détailler vos services, un référencement local travaillé pour être visible à Roanne et une direction artistique sur mesure au service de votre métier.',
+    price: '1500 €', // TODO: tarif réel
     features: [
-      'Jusqu’à six pages sur-mesure',
-      'Référencement local Roanne & Loire',
+      'Jusqu’à cinq pages sur-mesure',
+      'Choix du design & couleurs',
+      'Référencement (SEO) local Roanne & Loire',
       'Rédaction des textes accompagnée',
+      'Formulaire de contact sécurisé',
       'Conformité RGPD et mentions légales',
-      'Formation à la mise à jour du contenu',
     ],
     accent: 'features' as const,
   },
   {
     title: 'La Refonte',
     description:
-      "Votre site existe mais il vous dessert : lent, daté, invisible. On repart de la structure pour tout remettre d'aplomb.",
+      "Votre site actuel vous dessert ? Qu'il soit lent, daté ou invisible, il est temps de réagir. Ensemble, nous créons un design moderne et performant pour repartir sur de bonnes bases et capter enfin vos futurs clients.",
     price: 'sur devis', // TODO: tarif réel
     features: [
       'Audit technique et de performance',
       'Reprise de la structure et des contenus',
-      'Redirections et maintien du positionnement',
-      'Suivi trois mois après la mise en ligne',
+      'Choix du design & couleurs',
+      'Référencement (SEO) local Roanne & Loire',
+      'Ajout ou modification de section'
+    ],
+    accent: 'price' as const,
+  },
+];
+
+/* --- DONNÉES : les offres complémentaires ---
+   Deux prestations qui s'ajoutent à une formule principale, jamais vendues
+   seules. L'accent y est réservé au prix : les puces restent neutres. */
+// TODO: ajuster la liste des prestations incluses dans chacune
+const complements = [
+  {
+    title: 'Maintenance',
+    description:
+      "Un site à jour, sécurisé et sauvegardé. Besoin de changer un texte ou une image ? Vous bénéficiez de 3 interventions par mois, d'une heure chacune, pour faire évoluer votre contenu.",
+    price: '30 € / mois',
+    features: [
+      'Jusqu’à trois interventions par mois',
+      'Une heure d’intervention par demande',
+      'Modification des textes',
+      'Ajout ou remplacement de photos',
+      'Mises à jour techniques et sauvegardes',
+    ],
+    accent: 'price' as const,
+  },
+  {
+    title: 'Fiche Google',
+    description:
+      'Je crée et configure votre fiche d’établissement Google pour vous rendre visible dans les recherches locales et commencer à récolter des avis clients.',
+    price: '200 €',
+    features: [
+      'Création et vérification de la fiche',
+      'Catégories, horaires et zone d’intervention',
+      'Photos et description optimisées',
+      'Lien vers le site et suivi des premiers avis',
+      'Prise en main',
     ],
     accent: 'price' as const,
   },
 ];
 ---
 
-<section id="services" class="border-b border-carbon/10">
+<section id="services" data-anim-line class="filet-b">
   {/* --- En-tête de section --- */}
   <div class="mx-auto max-w-[1600px] px-6 pt-24 pb-16 md:px-10 lg:px-16 lg:pt-32 lg:pb-20 xl:px-24">
     <h2
       data-anim
       class="font-display text-[clamp(2rem,4.5vw,3.5rem)] font-bold leading-[1.05] tracking-[-0.03em] text-carbon"
     >
-      L'Atelier.
+      L'Agence<span class="text-accent">.</span>
     </h2>
   </div>
 
@@ -70,7 +109,7 @@ const services = [
       voir le fond `carbon/10` du conteneur : les lignes restent justes à
       tous les breakpoints, sans doublon ni filet orphelin.
       1 colonne en mobile, 2 en tablette, 3 en desktop. */}
-  <div class="border-t border-carbon/10">
+  <div data-anim-line class="filet-t">
     <div
       class:list={[
         'mx-auto grid max-w-[1600px] gap-px bg-carbon/10 md:grid-cols-2 lg:grid-cols-3',
@@ -88,6 +127,43 @@ const services = [
             price={service.price}
             features={service.features}
             accent={service.accent}
+          />
+        ))
+      }
+    </div>
+  </div>
+
+  {/* --- Offres complémentaires ---
+      `filet-t` : le filet pleine largeur qui sépare cette rangée de celle des
+      trois offres principales. */}
+  <div data-anim-line class="filet-t">
+    {/* Sous-titre discret, nettement plus petit que les H2 de section */}
+    <div class="mx-auto max-w-[1600px] px-6 pt-16 pb-10 md:px-10 lg:px-16 lg:pt-20 lg:pb-12 xl:px-24">
+      <h3
+        data-anim
+        class="font-display text-[clamp(1.25rem,2vw,1.75rem)] font-bold leading-tight tracking-[-0.02em] text-carbon"
+      >
+        En complément<span class="text-accent">.</span>
+      </h3>
+    </div>
+
+    {/* Même technique de filets que la rangée du dessus : la gouttière de 1px
+        laisse voir le fond `carbon/10`. Verticale à partir de md, horizontale
+        en dessous, sans réglage supplémentaire.
+        À partir de lg, la paire est ramenée aux deux tiers de la largeur et
+        centrée : chaque carte retrouve ainsi la largeur exacte des trois
+        cartes du dessus, au lieu de s'étirer sur toute la section.
+        `w-2/3` suit la largeur d'écran, `max-w-[1066px]` la borne aux deux
+        tiers du conteneur une fois celui-ci plafonné à 1600px. */}
+    <div class="mx-auto grid max-w-[1600px] gap-px bg-carbon/10 md:grid-cols-2 lg:w-2/3 lg:max-w-[1066px]">
+      {
+        complements.map((complement) => (
+          <ServiceCard
+            title={complement.title}
+            description={complement.description}
+            price={complement.price}
+            features={complement.features}
+            accent={complement.accent}
           />
         ))
       }

@@ -23,6 +23,13 @@ export default defineConfig({
     enabled: false,
   },
 
+  build: {
+    // La feuille de styles fait une dizaine de kilo-octets : servie en fichier
+    // séparé, elle bloque le rendu le temps d'un aller-retour réseau (180 ms
+    // mesurés au Lighthouse mobile). Inlinée, elle arrive avec le HTML.
+    inlineStylesheets: 'always',
+  },
+
   vite: {
     plugins: [tailwindcss()],
   },

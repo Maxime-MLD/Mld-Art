@@ -1,0 +1,84 @@
+---
+/* =========================================================================
+   realisations.astro — Page dédiée au portfolio
+   Reprend le motif de bandeau de titre du site, mais en <h1> : c'est le
+   titre principal de la page, pas une section parmi d'autres.
+   Les projets sont rendus par le composant ProjectCard existant, avec la
+   même alternance gauche/droite que sur l'accueil.
+   ========================================================================= */
+
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { projets } from '../data/projets';
+
+const title = 'Réalisations — Sites vitrines créés par MLD DEV à Roanne';
+const description =
+  'Les réalisations de MLD DEV : sites vitrines sur-mesure créés pour des artisans, commerçants et professionnels de Roanne et du département de la Loire.';
+---
+
+<Layout title={title} description={description}>
+  {/* --- Navigation principale --- */}
+  <Navbar />
+
+  <main>
+    <section data-anim-line class="filet-b">
+      {/* ==================================================================
+          BANDEAU DE TITRE — même motif que les bandeaux de section du site,
+          fermé par son propre filet. Aucun `border-t` : la ligne du dessus
+          est la bordure basse de la navbar.
+          ================================================================== */}
+      <div data-anim-line class="filet-b">
+        <div class="mx-auto max-w-[1600px] px-6 pt-24 pb-16 md:px-10 lg:px-16 lg:pt-32 lg:pb-20 xl:px-24">
+          <h1
+            data-anim
+            class="font-display text-[clamp(2rem,4.5vw,3.5rem)] font-bold leading-[1.05] tracking-[-0.03em] text-carbon"
+          >
+            Mes Réalisations<span class="text-accent">.</span>
+          </h1>
+        </div>
+      </div>
+
+      {/* --- Phrase d'introduction --- */}
+      <div class="mx-auto max-w-[1600px] px-6 py-16 md:px-10 lg:px-16 lg:py-20 xl:px-24">
+        <p data-anim class="max-w-2xl font-body text-base leading-relaxed text-carbon/70">
+          Chaque projet est pensé comme une œuvre unique.
+        </p>
+      </div>
+
+      {/* --- Catalogue complet ---
+          Chaque carte porte son filet horizontal supérieur : la séparation
+          entre deux projets est donc pleine largeur. */}
+      {
+        projets.map((project, index) => (
+          <ProjectCard
+            title={project.title}
+            category={project.category}
+            description={project.description}
+            descriptionLongue={project.descriptionLongue}
+            imageSrc={project.imageSrc}
+            imageAlt={project.imageAlt}
+            projectUrl={project.projectUrl}
+            isReversed={index % 2 === 1}
+          />
+        ))
+      }
+
+      {/* --- Retour à l'accueil, discret --- */}
+      <div class="mx-auto max-w-[1600px] px-6 py-24 md:px-10 lg:px-16 lg:py-32 xl:px-24">
+        {/* `/65` et non `/60` : à 14px, 60 % donne 4,29:1 et échoue au seuil
+            AA de 4,5:1 — axe le signale désormais. 65 % donne 5,04:1. */}
+        <a
+          href="/"
+          class="inline-block font-body text-sm text-carbon/65 transition-colors duration-300 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          <span aria-hidden="true">←</span> Retour à l'accueil
+        </a>
+      </div>
+    </section>
+  </main>
+
+  {/* --- Pied de page + watermark signature --- */}
+  <Footer />
+</Layout>

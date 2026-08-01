@@ -1,0 +1,57 @@
+# MLD DEV
+
+> Studio de création de sites vitrines sur-mesure à Roanne (Loire, 42), fondé par Maxime.
+
+## Activité
+
+MLD DEV conçoit et développe des sites vitrines pour les artisans, commerçants
+et petites entreprises du Roannais et du département de la Loire. Chaque projet
+est traité individuellement : direction artistique dédiée, développement
+sur-mesure, référencement local et conformité RGPD.
+
+- Zone d'intervention : Roanne, Vougy, Le Coteau, Riorges, Mably et l'ensemble du département de la Loire (42)
+- Prestations : site une page, site vitrine multi-pages, refonte de site existant
+- Site officiel : https://www.mld-dev.com
+
+## Stack technique
+
+- **Astro 5** — génération statique, zéro JavaScript inutile côté client
+- **Tailwind CSS 4** — tokens de design déclarés en `@theme`, sans `tailwind.config.js`
+- **GSAP + ScrollTrigger** — animations d'entrée et accordéons
+- **Lenis** — smooth scroll, synchronisé avec le ticker GSAP
+- **Web3Forms** — traitement du formulaire de contact
+- Polices auto-hébergées via `@fontsource` (aucune requête vers un CDN tiers)
+- Déploiement sur **Vercel**
+
+## Charte graphique
+
+Règle du 60 / 30 / 10 :
+
+| Rôle | Couleur | Part |
+|---|---|---|
+| Fond principal | `#EDEBE9` (papier-lin) | 60 % |
+| Texte et structure | `#1A1A1A` (carbone mat, jamais de noir pur) | 30 % |
+| Accent, actions clés | `#FF6600` (orange vif) | 10 % |
+
+Typographies :
+
+- **Plus Jakarta Sans** (700 / 800) — titres, logo, questions de la FAQ
+- **Inter** (400 / 500) — corps de texte, liens, libellés
+
+Note de contraste : l'orange n'est jamais employé en couleur de texte sur le
+fond papier (ratio 2,47:1, insuffisant). Il est utilisé en aplat, avec un texte
+en carbone par-dessus (5,93:1).
+
+## Principes de direction artistique
+
+- Esprit « galerie d'art » : architectural, sobre, beaucoup de blanc
+- Respiration verticale généreuse entre les sections
+- Séparations par filets ultra-fins (1 px, carbone à 10 %)
+- Angles droits, aucun arrondi marqué, aucune ombre portée
+- Visuels encadrés d'un filet fin anthracite
+- Signature du site : un watermark « MLD DEV. » géant en pied de page, calé au
+  pixel sur les bords, le point final en orange
+
+## Contact
+
+Formulaire de contact disponible sur https://www.mld-dev.com/#contact

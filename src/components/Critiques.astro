@@ -1,235 +1,182 @@
 ---
 /* =========================================================================
    Critiques.astro — Avis clients
-   Carrousel de cartes défilantes : flèches gauche / droite en aplat orange
-   et filets de pagination entre les deux, indiquant le nombre de pages.
-   Le défilement repose sur `scroll-snap` natif : accessible au clavier,
-   fonctionnel même si le JS ne se charge pas.
-   Aucune étoile, aucun avatar, aucune ombre portée.
+   Bandeau défilant en continu (marquee) : la liste est dupliquée une fois
+   dans le DOM et la piste est déplacée en `translateX` par GSAP.
+   Aucun conteneur à défilement natif ici : c'est ce qui capturait la molette
+   et empêchait la page de défiler quand le curseur passait sur la zone.
+   Aucun avatar, aucune ombre portée, aucun arrondi.
    ========================================================================= */
 
 /* --- DONNÉES : les avis --- */
 // TODO: remplacer par les avis réels (Google Business), avec accord des clients
 const reviews = [
   {
+    rating: 5,
     quote:
-      'Maxime a compris mon métier avant de parler design. Le site est sobre, rapide, et je reçois enfin des demandes de devis par le formulaire.',
-    author: 'Denis M.',
+      'Maxime a compris mon métier avant de parler design. Le site est moderne, rapide et magnifique, je reçois enfin des demandes de devis par le formulaire.',
+    author: 'Denis.G.',
     activity: 'Métallier — Vougy',
   },
   {
+    rating: 5,
     quote:
-      "Trois semaines entre le premier échange et la mise en ligne. Aucun jargon, des réponses claires, et un résultat très au-dessus de ce que j'imaginais.",
-    author: 'Claire B.',
+      "Trois semaines entre le premier échange et la mise en ligne. Aucun jargon, des réponses claires, et un résultat très au-dessus de ce que j'imaginais. J'adore.",
+    author: 'Claire.B.',
     activity: 'Salon de coiffure — Roanne',
   },
   {
+    rating: 5,
     quote:
-      'Notre ancien site mettait huit secondes à s’afficher. Le nouveau est instantané, et nous sommes remontés dans les recherches locales.',
-    author: 'L. Fauvel',
+      'Notre ancien site mettait huit secondes à s’afficher. Le nouveau est instantané et un designe moderne. Nous sommes remontés dans les recherches Google.',
+    author: 'Laurent.F.',
     activity: 'Cabinet dentaire — Le Coteau',
   },
   {
+    rating: 5,
     quote:
-      "Ce qui m'a marqué, c'est le soin apporté aux détails : les espacements, les photos recadrées, les textes retravaillés. Le site nous ressemble.",
-    author: 'Sophie R.',
+      "Ce qui m'a marqué, c'est le soin apporté aux détails : les espacements, les photos recadrées, les textes retravaillés. Le site nous ressemble. Je recommande MLD DEV.",
+    author: 'Sophie.R.',
     activity: 'Fleuriste — Riorges',
   },
   {
+    rating: 4,
     quote:
-      'Un interlocuteur unique du début à la fin, joignable, qui explique ce qu’il fait et pourquoi. Le devis annoncé a été le devis payé.',
-    author: 'Julien P.',
+      'Un interlocuteur unique du début à la fin, joignable, qui explique ce qu’il fait et pourquoi. Le devis annoncé a été le devis payé. Je recommande.',
+    author: 'Julien.P.',
     activity: 'Paysagiste — Mably',
   },
   {
+    rating: 5,
     quote:
-      'Nous étions invisibles sur Google en dehors de notre nom. Six mois après la mise en ligne, nous sortons sur nos deux principales prestations.',
-    author: 'Nathalie C.',
+      'Nous étions invisibles sur Google en dehors de notre nom. Six mois après la mise en ligne, nous sortons sur nos deux principales prestations. Merci Mld Dev.',
+    author: 'Nathalie.C.',
     activity: 'Institut de beauté — Roanne',
   },
 ];
+
+/* Chemin de l'étoile, isolé pour ne pas le répéter six fois par carte */
+const CHEMIN_ETOILE =
+  'M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 7.1-1.01L12 2z';
 ---
 
-<section id="critiques" class="border-b border-carbon/10">
-  <div class="mx-auto max-w-[1600px] px-6 py-24 md:px-10 lg:px-16 lg:py-32 xl:px-24">
-    {/* ==================================================================
-        EN-TÊTE — titre aligné sur les autres sections
-        ================================================================== */}
-    <h2
-      data-anim
-      class="font-display text-[clamp(2rem,4.5vw,3.5rem)] font-bold leading-[1.05] tracking-[-0.03em] text-carbon"
-    >
-      Les Critiques.
-    </h2>
+<section id="critiques" data-anim-line class="filet-b">
+  {/* ==================================================================
+      BANDEAU DE TITRE — pleine largeur, fermé par son propre filet.
+      Le filet du dessus est la bordure basse de la section précédente :
+      aucune section ne porte de `border-t`, sinon les traits doubleraient.
+      ================================================================== */}
+  <div data-anim-line class="filet-b">
+    <div class="mx-auto max-w-[1600px] px-6 pt-24 pb-16 md:px-10 lg:px-16 lg:pt-32 lg:pb-20 xl:px-24">
+      <h2
+        data-anim
+        class="font-display text-[clamp(2rem,4.5vw,3.5rem)] font-bold leading-[1.05] tracking-[-0.03em] text-carbon"
+      >
+        Les Critiques<span class="text-accent">.</span>
+      </h2>
+    </div>
+  </div>
 
-    {/* ==================================================================
-        PISTE DÉFILANTE
-        `data-lenis-prevent` : sans lui, Lenis capterait la molette et le
-        défilement horizontal interne serait inopérant.
-        ================================================================== */}
+  {/* ==================================================================
+      BANDEAU DÉFILANT
+      `overflow-hidden` seul : aucune zone scrollable, donc la molette
+      continue de faire défiler la page normalement.
+      En « animations réduites », le bandeau se replie en grille statique
+      (variantes `motion-reduce:`) et la copie est retirée du flux.
+      ================================================================== */}
+  <div
+    id="critiques-marquee"
+    class="overflow-hidden py-24 lg:py-32 motion-reduce:px-6 motion-reduce:md:px-10 motion-reduce:lg:px-16 motion-reduce:xl:px-24"
+  >
     <div
       id="critiques-track"
-      tabindex="0"
-      role="group"
-      aria-roledescription="carrousel"
-      aria-label="Avis de clients — liste défilante horizontalement"
-      data-lenis-prevent
-      class="mt-16 flex snap-x snap-mandatory gap-6 overflow-x-auto pb-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      class="flex w-max motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center"
     >
-      {
-        reviews.map((review) => (
-          <figure class="flex w-full shrink-0 snap-start flex-col border border-carbon/20 p-8 md:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-3rem)/3)] lg:p-10">
-            {/* Citation — Inter Regular, aucune emphase superflue */}
-            <blockquote class="font-body text-base leading-relaxed font-normal text-carbon/80">
-              « {review.quote} »
-            </blockquote>
-
-            {/* Attribution — petites majuscules, poussée en bas de carte.
-                Opacité 65 % : palier minimal tenant le contraste AA à 12px. */}
-            <figcaption class="mt-10 font-body text-xs uppercase tracking-wider text-carbon/65">
-              <span class="text-carbon">{review.author}</span>
-              <span aria-hidden="true"> · </span>
-              {review.activity}
-            </figcaption>
-          </figure>
-        ))
-      }
-    </div>
-
-    {/* ==================================================================
-        COMMANDES DU CARROUSEL — centrées sous les avis
-        Écarts resserrés en mobile : une page par carte y donne six filets,
-        qui ne tiendraient pas dans la largeur avec les écarts du desktop.
-        ================================================================== */}
-    <div class="mt-14 flex items-center justify-center gap-3 md:gap-6">
-        {/* Flèche précédente */}
-        <button
-          id="critiques-prev"
-          type="button"
-          aria-label="Avis précédents"
-          aria-controls="critiques-track"
-          class="flex h-11 w-11 shrink-0 items-center justify-center bg-accent text-carbon transition-colors duration-300 hover:bg-carbon hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-30"
-        >
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="square"
-            class="h-4 w-4"
-          >
-            <path d="M10 2.5 4.5 8l5.5 5.5" />
-          </svg>
-        </button>
-
-        {/* Filets de pagination — un trait par page.
-            Les traits en surnombre sont masqués en JS selon le breakpoint. */}
-        <div id="critiques-pagination" class="flex items-center gap-1 md:gap-2">
-          {
-            reviews.map((_, index) => (
-              <button
-                type="button"
-                data-page={index}
-                aria-label={`Aller à la page ${index + 1}`}
-                class="group flex h-11 w-6 shrink-0 items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:w-8"
+      {/* --- Liste visible --- */}
+      <div class="flex motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-y-12">
+        {
+          reviews.map((review) => (
+            <figure class="flex w-[300px] shrink-0 flex-col border-l border-carbon/10 px-8 lg:w-[380px]">
+              {/* 1. Note — étoiles décoratives, l'information est portée par
+                     le libellé accessible du groupe */}
+              <div
+                role="img"
+                aria-label={`Note : ${review.rating} étoiles sur 5`}
+                class="flex items-center gap-1 text-accent"
               >
-                {/* Trait fin : carbon plein pour la page courante, carbon/20 sinon */}
-                <span
-                  class="block h-px w-4 bg-carbon/20 transition-colors duration-300 group-hover:bg-carbon/50 group-aria-[current=true]:bg-carbon md:w-6"
-                />
-              </button>
-            ))
-          }
-        </div>
+                {
+                  Array.from({ length: review.rating }).map(() => (
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      class="h-3.5 w-3.5"
+                    >
+                      <path d={CHEMIN_ETOILE} />
+                    </svg>
+                  ))
+                }
+              </div>
 
-        {/* Flèche suivante */}
-        <button
-          id="critiques-next"
-          type="button"
-          aria-label="Avis suivants"
-          aria-controls="critiques-track"
-          class="flex h-11 w-11 shrink-0 items-center justify-center bg-accent text-carbon transition-colors duration-300 hover:bg-carbon hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-30"
-        >
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="square"
-            class="h-4 w-4"
-          >
-            <path d="M6 2.5 11.5 8 6 13.5" />
-          </svg>
-        </button>
+              {/* 2. Citation */}
+              <blockquote class="mt-6 font-body text-base leading-relaxed text-carbon">
+                {review.quote}
+              </blockquote>
+
+              {/* 3. Filet court en accent — respiration généreuse de part et
+                     d'autre, il sépare la parole du client de sa signature */}
+              <div aria-hidden="true" class="my-10 h-px w-10 bg-accent"></div>
+
+              {/* 4 & 5. Signature : nom, puis activité et ville */}
+              <figcaption class="mt-auto">
+                <p class="font-display text-sm font-semibold text-carbon">
+                  {review.author}
+                </p>
+                {/* Opacité 65 % : palier minimal tenant le contraste AA à 12px
+                    (60 % tombe à 4,31:1, sous le seuil de 4,5:1) */}
+                <p class="mt-2 font-body text-xs uppercase tracking-wider text-carbon/65">
+                  {review.activity}
+                </p>
+              </figcaption>
+            </figure>
+          ))
+        }
+      </div>
+
+      {/* --- Copie pour la boucle sans raccord ---
+          Strictement identique à la liste visible : les deux moitiés de la
+          piste étant égales, un déplacement de -50 % boucle sans saut.
+          Retirée de l'arbre d'accessibilité et du flux si les animations
+          sont désactivées. */}
+      <div aria-hidden="true" class="flex motion-reduce:hidden">
+        {
+          reviews.map((review) => (
+            <figure class="flex w-[300px] shrink-0 flex-col border-l border-carbon/10 px-8 lg:w-[380px]">
+              <div class="flex items-center gap-1 text-accent">
+                {
+                  Array.from({ length: review.rating }).map(() => (
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="h-3.5 w-3.5">
+                      <path d={CHEMIN_ETOILE} />
+                    </svg>
+                  ))
+                }
+              </div>
+              <blockquote class="mt-6 font-body text-base leading-relaxed text-carbon">
+                {review.quote}
+              </blockquote>
+              <div class="my-10 h-px w-10 bg-accent"></div>
+              <figcaption class="mt-auto">
+                <p class="font-display text-sm font-semibold text-carbon">
+                  {review.author}
+                </p>
+                <p class="mt-2 font-body text-xs uppercase tracking-wider text-carbon/65">
+                  {review.activity}
+                </p>
+              </figcaption>
+            </figure>
+          ))
+        }
+      </div>
     </div>
   </div>
 </section>
-
-<script>
-  /* -----------------------------------------------------------------------
-     Carrousel des avis
-     Le défilement se fait page par page : une page = la largeur visible de
-     la piste. Le nombre de cartes visibles étant défini en CSS (1 / 2 / 3),
-     le nombre de pages se recalcule à chaque redimensionnement.
-     ----------------------------------------------------------------------- */
-  const track = document.getElementById('critiques-track');
-  const prevButton = document.getElementById('critiques-prev') as HTMLButtonElement | null;
-  const nextButton = document.getElementById('critiques-next') as HTMLButtonElement | null;
-  const pagination = document.getElementById('critiques-pagination');
-
-  if (track && prevButton && nextButton && pagination) {
-    const dots = Array.from(pagination.querySelectorAll('button'));
-
-    /* Largeur d'une page : zone visible + gouttière.
-       C'est cette valeur qui fait tomber le défilement pile sur une carte. */
-    const pageWidth = () => {
-      const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
-      return track.clientWidth + gap;
-    };
-
-    const pageCount = () => Math.max(1, Math.ceil(track.scrollWidth / pageWidth()));
-    const currentPage = () =>
-      Math.min(pageCount() - 1, Math.round(track.scrollLeft / pageWidth()));
-
-    /* Mise à jour des commandes : traits visibles, page courante,
-       flèches désactivées en début et en fin de piste. */
-    const syncControls = () => {
-      const total = pageCount();
-      const current = currentPage();
-
-      dots.forEach((dot, index) => {
-        dot.hidden = index >= total;
-        dot.setAttribute('aria-current', String(index === current));
-        dot.setAttribute('aria-label', `Aller à la page ${index + 1} sur ${total}`);
-      });
-
-      /* Une seule page : les commandes n'ont plus d'objet */
-      const isSinglePage = total <= 1;
-      pagination.hidden = isSinglePage;
-      prevButton.disabled = isSinglePage || current === 0;
-      nextButton.disabled = isSinglePage || current >= total - 1;
-    };
-
-    /* Défilement d'une page, dans un sens ou dans l'autre */
-    const scrollByPage = (direction: number) => {
-      track.scrollBy({ left: direction * pageWidth(), behavior: 'smooth' });
-    };
-
-    prevButton.addEventListener('click', () => scrollByPage(-1));
-    nextButton.addEventListener('click', () => scrollByPage(1));
-
-    /* Clic sur un trait : saut direct à la page correspondante */
-    dots.forEach((dot, index) => {
-      dot.addEventListener('click', () => {
-        track.scrollTo({ left: index * pageWidth(), behavior: 'smooth' });
-      });
-    });
-
-    /* Le défilement manuel (molette, doigt, clavier) met aussi à jour l'état */
-    track.addEventListener('scroll', syncControls, { passive: true });
-    window.addEventListener('resize', syncControls);
-    syncControls();
-  }
-</script>

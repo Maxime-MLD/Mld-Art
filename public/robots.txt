@@ -1,0 +1,9 @@
+# robots.txt — https://www.mld-dev.com
+# Le site est entièrement ouvert à l'indexation, à l'exception des pages
+# légales qui n'ont pas vocation à ressortir dans les résultats de recherche.
+
+User-agent: *
+Allow: /
+Disallow: /mentions-legales
+
+Sitemap: https://www.mld-dev.com/sitemap-index.xml

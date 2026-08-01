@@ -1,8 +1,11 @@
 ---
 /* =========================================================================
    ServiceCard.astro — Une prestation, présentée comme un cartel de musée
-   Usage chirurgical de l'orange : chaque carte ne porte l'accent QUE sur un
-   seul élément, le prix OU les puces de validation — jamais les deux.
+   Toutes les cartes portent désormais l'accent sur les deux éléments : le
+   prix en aplat orange (texte carbon, 5,93:1) et les puces de validation en
+   orange. Ces puces sont des marqueurs décoratifs (`aria-hidden`), leur sens
+   étant porté par le texte adjacent — l'orange en aplat sur fond papier ne
+   dépasse pas 2,47:1 et ne conviendrait pas à du texte.
    ========================================================================= */
 
 interface Props {
@@ -10,24 +13,23 @@ interface Props {
   description: string;
   price: string;
   features: string[];
-  /* Élément qui porte l'accent orange dans cette carte.
-     L'orange en texte sur fond papier ne dépasse pas 2,47:1 (échec WCAG AA) :
-     sur le prix, l'accent est donc appliqué en aplat avec un texte carbon
-     (5,93:1). Sur les puces, il reste en couleur — ce sont des marqueurs
-     décoratifs, dont le sens est porté par le texte adjacent. */
+  /* Conservé pour ne pas modifier les appels existants, mais sans effet :
+     l'accent s'applique désormais au prix ET aux puces dans toutes les
+     cartes. À retirer ici et dans Services.astro lors d'un prochain passage. */
   accent?: 'price' | 'features';
 }
 
-const { title, description, price, features, accent = 'price' } = Astro.props;
-
-const accentOnPrice = accent === 'price';
+const { title, description, price, features } = Astro.props;
 ---
 
 {/* `bg-paper` est indispensable : la grille parente laisse apparaître son
    fond `carbon/10` dans les gouttières de 1px, ce qui dessine les filets.
    Le padding horizontal reprend celui des sections pour que le titre de la
    première colonne s'aligne exactement sur le H2 de la section. */}
-<article class="flex flex-col bg-paper px-6 py-12 md:px-10 md:py-14 lg:px-16 lg:py-16 xl:px-24">
+<article
+  data-anim
+  class="flex flex-col bg-paper px-6 py-12 md:px-10 md:py-14 lg:px-16 lg:py-16 xl:px-24"
+>
   {/* --- Intitulé de la prestation --- */}
   <h3 class="font-display text-2xl font-bold leading-tight tracking-[-0.02em] text-carbon">
     {title}
@@ -38,21 +40,11 @@ const accentOnPrice = accent === 'price';
     {description}
   </p>
 
-  {/* --- Prix ---
-      Variante accentuée : aplat orange, texte carbon.
-      Variante sobre : texte carbon, l'accent est réservé aux puces. */}
+  {/* --- Prix — aplat orange, texte carbon (contraste 5,93:1) --- */}
   <div class="mt-10">
-    {
-      accentOnPrice ? (
-        <p class="inline-block bg-accent px-4 py-2 font-display text-2xl font-bold tracking-tight text-carbon">
-          {price}
-        </p>
-      ) : (
-        <p class="font-display text-2xl font-bold tracking-tight text-carbon">
-          {price}
-        </p>
-      )
-    }
+    <p class="inline-block bg-accent px-4 py-2 font-display text-2xl font-bold tracking-tight text-carbon">
+      {price}
+    </p>
   </div>
 
   {/* --- Détail de la prestation, séparé par un filet fin --- */}
@@ -68,10 +60,7 @@ const accentOnPrice = accent === 'price';
             stroke="currentColor"
             stroke-width="1.5"
             stroke-linecap="square"
-            class:list={[
-              'mt-[5px] h-3 w-3 shrink-0',
-              accentOnPrice ? 'text-carbon/30' : 'text-accent',
-            ]}
+            class="mt-[5px] h-3 w-3 shrink-0 text-accent"
           >
             <path d="M1.5 6.5 4.5 9.5 10.5 2.5" />
           </svg>

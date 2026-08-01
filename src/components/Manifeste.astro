@@ -1,20 +1,20 @@
 ---
 /* =========================================================================
-   Manifeste.astro — Phrase de positionnement
-   Section volontairement vide de tout élément graphique : seule la
-   typographie et le blanc travaillent. Sert aussi d'ancre « À Propos ».
+  Manifeste.astro — Phrase de positionnement
+  Section volontairement vide de tout élément graphique : seule la
+  typographie et le blanc travaillent. Sert aussi d'ancre « À Propos ».
    ========================================================================= */
 ---
 
-<section id="manifeste" class="border-b border-carbon/10">
+<section id="manifeste" data-anim-line class="filet-b">
   <div class="mx-auto max-w-[1600px] px-6 py-32 md:px-10 lg:px-16 xl:px-24">
-    {/* Phrase unique — légèrement décalée vers l'intérieur en desktop */}
+    {/* Phrase unique — bloc centré dans la page, texte centré */}
     <p
       data-anim
-      class="max-w-4xl font-display text-[clamp(1.625rem,3.2vw,2.75rem)] font-bold leading-[1.3] tracking-[-0.02em] text-carbon lg:ml-[8%]"
+      class="mx-auto max-w-4xl text-center font-display text-[clamp(1.625rem,3.2vw,2.75rem)] font-bold leading-[1.3] tracking-[-0.02em] text-carbon"
     >
-      « Nous croyons que votre site web doit être aussi unique que votre
-      savoir-faire. »
+      <span class="text-accent">«</span> Nous croyons que votre site web doit être aussi unique que votre
+      savoir-faire. <span class="text-accent">»</span>
     </p>
   </div>
 </section>

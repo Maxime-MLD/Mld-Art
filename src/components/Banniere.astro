@@ -1,0 +1,172 @@
+---
+/* =========================================================================
+   Banniere.astro — Bandeau visuel pleine largeur
+   Full-bleed, sans cadre : ce sont les filets des sections voisines qui
+   l'encadrent. Comme partout sur le site, il ne porte qu'un `border-b` —
+   la ligne du dessus est la bordure basse de la section précédente.
+   Empilement, du fond vers la surface : image → teinte chaude → grain fin →
+   grain grossier → voile dégradé → texte. Le texte ne reçoit ni grain ni
+   teinte, et tous les calques intermédiaires sont inertes.
+   ========================================================================= */
+
+import { Picture } from 'astro:assets';
+
+/* TODO: remplacer par le visuel définitif */
+import visuelBanniere from '../assets/placeholders/banner.png';
+
+/* --- GRAIN ---
+   Généré en CSS, jamais incrusté dans le fichier image : il reste net à
+   toutes les tailles, ne pèse rien, et le visuel peut être remplacé sans
+   avoir à le retexturer.
+
+   La tuile a une taille FIXE en pixels et se répète. Étirée sur toute la
+   largeur du bandeau, la turbulence perdrait sa finesse et virerait à la
+   texture floue ; en tuile de 160px, le grain garde le même piqué sur un
+   téléphone comme sur un écran large.
+
+   `feColorMatrix saturate=0` : la turbulence est colorée par défaut, elle
+   piquerait l'image de pixels rouges et bleus. */
+const tuile = (taille: number, frequence: number, id: string) =>
+  `<svg xmlns='http://www.w3.org/2000/svg' width='${taille}' height='${taille}'>` +
+  `<filter id='${id}'>` +
+  `<feTurbulence type='fractalNoise' baseFrequency='${frequence}' numOctaves='3' stitchTiles='stitch'/>` +
+  `<feColorMatrix type='saturate' values='0'/>` +
+  `</filter>` +
+  `<rect width='${taille}' height='${taille}' filter='url(%23${id})'/></svg>`;
+
+const fondTuile = (taille: number, frequence: number, id: string) =>
+  `background-image:url("data:image/svg+xml,${tuile(taille, frequence, id)}");` +
+  `background-size:${taille}px ${taille}px;background-repeat:repeat;`;
+
+/* Grain fin : c'est lui qui porte la matière.
+   `soft-light` plutôt qu'`overlay` : overlay s'annule dans les tons moyens,
+   or l'image en est presque entièrement composée.
+   Opacité à régler entre 0.25 et 0.45 selon le visuel définitif. */
+const grainFin = `${fondTuile(160, 0.75, 'gf')}mix-blend-mode:soft-light;opacity:0.35;`;
+
+/* Grain grossier : casse la régularité du premier, qui « moutonne » sinon. */
+const grainGrossier = `${fondTuile(320, 0.35, 'gg')}mix-blend-mode:overlay;opacity:0.15;`;
+
+/* --- TEINTE CHAUDE ---
+   Beige doré en `soft-light` : referme les noirs, casse les blancs purs et
+   tire la palette vers le chaud. C'est cet étalonnage, plus que le grain,
+   qui donne l'aspect « tirage argentique ».
+   Couleur hors charte, volontairement : ce n'est pas une couleur
+   d'interface mais un filtre photographique. */
+const teinteChaude = 'background-color:#C8B89A;mix-blend-mode:soft-light;opacity:0.18;';
+
+/* --- VOILE DÉGRADÉ ---
+   Très dense à gauche, chute rapide, quasi nul à droite : le texte reste
+   lisible sans que l'image soit noyée.
+   Écrit en style inline et non en classe Tailwind : une valeur arbitraire
+   construite en JS ne serait pas détectée par le scanner de Tailwind.
+
+   ⚠️ Les paliers ne sont pas décoratifs. Mesuré sur le visuel actuel, en
+   tenant compte de la teinte chaude et des deux grains, le texte `paper`
+   exige un voile d'au moins 0,62 sur toute la zone qu'il occupe — soit
+   jusqu'à 53 % de la largeur. Le profil d'origine (0,40 dès 50 %) tombait
+   à 2,90:1, sous le seuil WCAG AA de 4,5:1 ; celui-ci donne 4,86:1.
+   Si le visuel définitif est plus sombre, ces valeurs pourront être
+   redescendues — à revérifier à ce moment-là. */
+const profil =
+  'color-mix(in srgb, var(--color-carbon) 72%, transparent) 0%,' +
+  'color-mix(in srgb, var(--color-carbon) 66%, transparent) 35%,' +
+  'color-mix(in srgb, var(--color-carbon) 60%, transparent) 55%,' +
+  'color-mix(in srgb, var(--color-carbon) 16%, transparent) 75%,' +
+  'transparent 100%';
+
+const voileHorizontal = `background-image:linear-gradient(to right,${profil});`;
+
+/* Sous md le texte se recentre : le dégradé bascule à la verticale, le plus
+   dense en bas.
+   Le profil y est plus soutenu, et pour une raison mesurée : le texte n'y est
+   plus collé au bord dense, il occupe la bande située entre 43 % et 57 % de
+   la hauteur, là où un dégradé partant du bas s'est déjà bien aminci. Il faut
+   0,65 sur toute cette bande ; le palier est donc tenu jusqu'à 60 % avant de
+   chuter. */
+const profilVertical =
+  'color-mix(in srgb, var(--color-carbon) 78%, transparent) 0%,' +
+  'color-mix(in srgb, var(--color-carbon) 72%, transparent) 40%,' +
+  'color-mix(in srgb, var(--color-carbon) 68%, transparent) 60%,' +
+  'color-mix(in srgb, var(--color-carbon) 20%, transparent) 82%,' +
+  'transparent 100%';
+
+const voileVertical = `background-image:linear-gradient(to top,${profilVertical});`;
+---
+
+{/* `aspect-*` fixe la hauteur à partir de la largeur, `max-h-[70vh]` la
+    plafonne : sur un écran large, un 16/9 pur dépasserait 1000px de haut et
+    mangerait tout le viewport. C'est `object-cover` qui absorbe l'écart.
+    Sous md, un 16/9 donnerait une bande trop fine pour le texte : on passe
+    en 4/5, puis 16/10 en tablette. */}
+<section
+  data-banniere
+  class="relative w-full overflow-hidden border-b border-carbon/10 aspect-[4/5] max-h-[70vh] md:aspect-[16/10] lg:aspect-video"
+>
+  {/* --- Visuel ---
+      En bas de page : chargement différé, décodage asynchrone. */}
+  <Picture
+    src={visuelBanniere}
+    alt="Une visiteuse observe un site web créé par MLD DEV, présenté comme une œuvre encadrée dans un musée"
+    widths={[1200, 1600, 2000]}
+    sizes="100vw"
+    formats={['avif']}
+    fallbackFormat="webp"
+    quality={80}
+    loading="lazy"
+    decoding="async"
+    data-banniere-image
+    pictureAttributes={{ class: 'absolute inset-0 block h-full w-full' }}
+    class="h-full w-full object-cover object-center [filter:saturate(0.85)_contrast(0.94)_brightness(1.02)]"
+  />
+
+  {/* --- Teinte chaude (1er calque au-dessus de l'image) --- */}
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0" style={teinteChaude}></div>
+
+  {/* --- Grain fin ---
+      Les calques de grain sont posés sur la section, pas sur l'image : ils
+      ne suivent donc pas le parallaxe. Une texture qui se déplacerait sur
+      elle-même produirait un moirage à chaque défilement. */}
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0" style={grainFin}></div>
+
+  {/* --- Grain grossier --- */}
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0" style={grainGrossier}></div>
+
+  {/* --- Voile dégradé ---
+      Deux calques plutôt qu'un seul : la direction change sous md, et un
+      style inline ne peut pas porter de media query. */}
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute inset-0 md:hidden"
+    style={voileVertical}
+  >
+  </div>
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute inset-0 hidden md:block"
+    style={voileHorizontal}
+  >
+  </div>
+
+  {/* --- Texte en surimpression ---
+      Du vrai HTML, jamais incrusté dans l'image.
+      `<p>` et non `<h2>` : ce bandeau n'introduit aucune section, un titre de
+      niveau 2 créerait une entrée vide dans le plan du document.
+      Conteneur identique à celui de la navbar : le texte s'aligne donc au
+      pixel sur le logo et sur le H1 du Hero. */}
+  <div class="absolute inset-0 flex items-center">
+    <div class="mx-auto w-full max-w-[1600px] px-6 md:px-10 lg:px-16 xl:px-24">
+      {/* `md:max-w-[54%]` : exprimée en proportion du conteneur, la mesure du
+          texte se termine toujours vers 53 % de la largeur d'écran, quel que
+          soit le breakpoint. C'est ce qui permet au voile de rester un
+          dégradé — palier à 60 %, puis effacement — au lieu de devoir couvrir
+          toute la largeur. Une largeur fixe finissait à 73 % de l'écran en
+          1024px, hors de la zone voilée. */}
+      <p
+        class="max-w-2xl font-display text-[clamp(2rem,5vw,4.5rem)] font-extrabold leading-[1.05] tracking-[-0.03em] text-paper md:max-w-[54%]"
+      >
+        L'art de créer <br> des sites web<span class="text-accent">.</span>
+      </p>
+    </div>
+  </div>
+</section>

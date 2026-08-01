@@ -1,0 +1,222 @@
+---
+/* =========================================================================
+   mentions-legales.astro — Mentions légales & politique de confidentialité
+   Page volontairement sobre, en `noindex` (voir LegalLayout).
+   ⚠️ Tous les blocs TODO doivent être complétés avant la mise en ligne :
+   l'absence de ces mentions est sanctionnable (art. 6 III LCEN) et le volet
+   données personnelles relève du RGPD.
+   ========================================================================= */
+
+import LegalLayout from '../layouts/LegalLayout.astro';
+
+/* Classes partagées, pour un rythme typographique constant d'un bloc à l'autre */
+const sectionClasses = 'border-t border-carbon/10 pt-10 mt-10 first:mt-0 first:border-t-0 first:pt-0';
+const headingClasses = 'font-display text-xl font-bold tracking-tight text-carbon';
+const paragraphClasses = 'mt-5 font-body text-base leading-relaxed text-carbon/70';
+const listClasses = 'mt-5 space-y-3 font-body text-base leading-relaxed text-carbon/70';
+---
+
+<LegalLayout
+  title="Mentions Légales & Confidentialité"
+  description="Mentions légales, informations sur l'éditeur, l'hébergeur et la politique de confidentialité du site MLD DEV."
+>
+  {/* --- Date de mise à jour --- */}
+  <p class="font-body text-xs uppercase tracking-wider text-carbon/65">
+    {/* TODO: date de dernière mise à jour */}
+    Dernière mise à jour : 31/07/2026
+  </p>
+
+  <div class="mt-12">
+    {/* ==================================================================
+        1. ÉDITEUR DU SITE
+        ================================================================== */}
+    <section class={sectionClasses}>
+      <h2 class={headingClasses}>1. Éditeur du site</h2>
+      <p class={paragraphClasses}>
+        Le présent site est édité par :
+      </p>
+      <ul class={listClasses}>
+        {/* TODO: dénomination sociale ou nom et prénom de l'entrepreneur */}
+        <li>Dénomination : MLD DEV</li>
+        {/* TODO: forme juridique (micro-entreprise, EI, SASU, EURL…) */}
+        <li>Statut juridique : Entrepreneur individuel — profession libérale non réglementée</li>
+        {/* TODO: adresse complète du siège (Roanne ou Vougy) */}
+        <li>Adresse : 41 chemin de villevert Vougy, France</li>
+        {/* TODO: numéro SIRET à 14 chiffres */}
+        <li>SIRET : 84879902900022</li>
+        {/* TODO: numéro de TVA intracommunautaire, ou mention de franchise en base */}
+        <!-- <li>TVA intracommunautaire : à compléter</li> -->
+        {/* TODO: téléphone */}
+        <li>Téléphone : 06 62 59 97 71</li>
+        {/* TODO: email de contact */}
+        <li>Email :  contact@mld-dev.com</li>
+      </ul>
+    </section>
+
+    {/* ==================================================================
+        2. DIRECTEUR DE LA PUBLICATION
+        ================================================================== */}
+    <section class={sectionClasses}>
+      <h2 class={headingClasses}>2. Directeur de la publication</h2>
+      <p class={paragraphClasses}>
+        {/* TODO: nom et prénom du directeur de la publication */}
+        Le directeur de la publication est Maxime Lagraa, en qualité de
+        responsable éditorial du site.
+      </p>
+    </section>
+
+    {/* ==================================================================
+        3. HÉBERGEUR
+        ================================================================== */}
+    <section class={sectionClasses}>
+      <h2 class={headingClasses}>3. Hébergement</h2>
+      <p class={paragraphClasses}>Le site est hébergé par : Vercel Inc</p>
+      <ul class={listClasses}>
+        {/* TODO: raison sociale de l'hébergeur */}
+        <li>Hébergeur : Vercel Inc</li>
+        {/* TODO: adresse postale complète de l'hébergeur */}
+        <li>Adresse : 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis</li>
+        {/* TODO: téléphone de l'hébergeur (obligatoire au titre de la LCEN) */}
+        <li>Site web : https://vercel.com/</li>
+      </ul>
+    </section>
+
+    {/* ==================================================================
+        4. PROPRIÉTÉ INTELLECTUELLE
+        ================================================================== */}
+    <section class={sectionClasses}>
+      <h2 class={headingClasses}>4. Propriété intellectuelle</h2>
+      <p class={paragraphClasses}>
+        L'ensemble des éléments composant ce site — structure, textes, visuels,
+        photographies, illustrations, logotypes, code source et charte
+        graphique — est protégé par le droit de la propriété intellectuelle et
+        demeure la propriété exclusive de MLD DEV ou de ses partenaires.
+      </p>
+      <p class={paragraphClasses}>
+        Toute reproduction, représentation, modification ou exploitation, totale
+        ou partielle, par quelque procédé que ce soit et sur quelque support que
+        ce soit, est interdite sans autorisation écrite préalable.
+      </p>
+      <!-- <p class={paragraphClasses}>
+        {/* TODO: crédits photo / typographies si des ressources tierces sont utilisées */}
+        Crédits visuels et typographiques : à compléter.
+      </p> -->
+    </section>
+
+    {/* ==================================================================
+        5. DONNÉES PERSONNELLES (RGPD)
+        ================================================================== */}
+    <section class={sectionClasses}>
+      <h2 class={headingClasses}>5. Données personnelles</h2>
+
+      <h3 class="mt-8 font-display text-base font-semibold text-carbon">
+        Finalité du traitement
+      </h3>
+      <p class={paragraphClasses}>
+        Les données saisies dans le formulaire de contact (nom, adresse email et
+        contenu du message) sont collectées dans le seul but de répondre à votre
+        demande et, le cas échéant, de gérer la relation commerciale qui peut en
+        découler. Elles ne font l'objet d'aucune cession ni d'aucune revente.
+      </p>
+
+      <h3 class="mt-8 font-display text-base font-semibold text-carbon">
+        Base légale
+      </h3>
+      <p class={paragraphClasses}>
+        Le traitement repose sur votre consentement, recueilli par la case à
+        cocher du formulaire, ainsi que sur l'exécution de mesures
+        précontractuelles prises à votre demande.
+      </p>
+
+      <h3 class="mt-8 font-display text-base font-semibold text-carbon">
+        Destinataires et sous-traitants
+      </h3>
+      <p class={paragraphClasses}>
+        Les messages transitent par le service Web3Forms, qui assure
+        l'acheminement du formulaire vers la boîte email de MLD DEV. Aucune
+        donnée n'est transmise à d'autres tiers.
+        {/* TODO: vérifier et mentionner la localisation des serveurs de Web3Forms
+            et, si nécessaire, la garantie de transfert hors UE applicable */}
+      </p>
+
+      <h3 class="mt-8 font-display text-base font-semibold text-carbon">
+        Durée de conservation
+      </h3>
+      <p class={paragraphClasses}>
+        {/* TODO: durée réelle de conservation (usage courant : 3 ans après le
+            dernier contact pour la prospection, 10 ans pour les pièces
+            comptables) */}
+        Les données transmises via le formulaire sont conservées le temps nécessaire au traitement de votre demande, puis supprimées ou archivées conformément aux obligations légales applicables.
+      </p>
+
+      <h3 class="mt-8 font-display text-base font-semibold text-carbon">
+        Vos droits
+      </h3>
+      <p class={paragraphClasses}>
+        Conformément au Règlement général sur la protection des données et à la
+        loi Informatique et Libertés, vous disposez des droits suivants sur vos
+        données :
+      </p>
+      <ul class={listClasses}>
+        <li>droit d'accès et de copie ;</li>
+        <li>droit de rectification ;</li>
+        <li>droit à l'effacement (« droit à l'oubli ») ;</li>
+        <li>droit à la limitation du traitement ;</li>
+        <li>droit d'opposition, notamment à la prospection ;</li>
+        <li>droit à la portabilité de vos données ;</li>
+        <li>droit de retirer votre consentement à tout moment.</li>
+      </ul>
+      <p class={paragraphClasses}>
+        {/* TODO: email de contact pour l'exercice des droits (contact RGPD / DPO) */}
+        Ces droits s'exercent par email à l'adresse contact@mld-dev.com, ou par courrier
+        à l'adresse du siège indiquée à l'article 1. Une réponse vous sera
+        apportée dans un délai d'un mois.
+      </p>
+      <p class={paragraphClasses}>
+        Si vous estimez, après nous avoir contactés, que vos droits ne sont pas
+        respectés, vous pouvez adresser une réclamation à la CNIL — 3 place de
+        Fontenoy, TSA 80715, 75334 Paris Cedex 07 — ou via le site
+        <a
+          href="https://www.cnil.fr"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-carbon underline decoration-1 underline-offset-4 transition-colors duration-300 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          cnil.fr
+        </a>.
+      </p>
+    </section>
+
+    {/* ==================================================================
+        6. COOKIES
+        ================================================================== */}
+    <section class={sectionClasses}>
+      <h2 class={headingClasses}>6. Cookies et traceurs</h2>
+      <p class={paragraphClasses}>
+        Ce site ne dépose aucun cookie publicitaire ni aucun traceur de mesure
+        d'audience. Les polices de caractères sont hébergées sur le serveur du
+        site : aucune requête n'est adressée à un service tiers lors de la
+        consultation des pages, et aucune adresse IP n'est transmise hors de
+        l'Union européenne à ce titre.
+      </p>
+      <p class={paragraphClasses}>
+        {/* TODO: si un outil de mesure d'audience est ajouté (Plausible,
+            Matomo, Google Analytics…), décrire ici les cookies déposés, leur
+            durée de vie, et mettre en place un bandeau de consentement */}
+        Aucun consentement préalable n'est donc requis à ce jour.
+      </p>
+    </section>
+
+    {/* ==================================================================
+        7. DROIT APPLICABLE
+        ================================================================== */}
+    <section class={sectionClasses}>
+      <h2 class={headingClasses}>7. Droit applicable</h2>
+      <p class={paragraphClasses}>
+        Les présentes mentions légales sont soumises au droit français. En cas
+        de litige, et à défaut de résolution amiable, les tribunaux français
+        seront seuls compétents.
+      </p>
+    </section>
+  </div>
+</LegalLayout>

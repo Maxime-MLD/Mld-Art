@@ -15,6 +15,7 @@ import Realisations from '../components/Realisations.astro';
 import Services from '../components/Services.astro';
 import Critiques from '../components/Critiques.astro';
 import Faq from '../components/Faq.astro';
+import Banniere from '../components/Banniere.astro';
 import Contact from '../components/Contact.astro';
 import Footer from '../components/Footer.astro';
 ---
@@ -32,15 +33,19 @@ import Footer from '../components/Footer.astro';
 
     {/* --- Portfolio --- */}
     <Realisations />
+    
+    {/* --- Avis clients --- */}
+    <Critiques />
 
     {/* --- Prestations --- */}
     <Services />
 
-    {/* --- Avis clients --- */}
-    <Critiques />
 
     {/* --- Questions fréquentes --- */}
     <Faq />
+
+    {/* --- Bandeau visuel pleine largeur --- */}
+    <Banniere />
 
     {/* --- Prise de contact --- */}
     <Contact />

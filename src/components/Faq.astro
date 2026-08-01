@@ -1,9 +1,9 @@
 ---
 /* =========================================================================
-   Faq.astro — Questions fréquentes
-   Balisage <details> / <summary> : accessible au clavier nativement.
-   L'ouverture est interceptée dans `animations.js` pour animer la hauteur
-   à la place du saut brutal du navigateur.
+  Faq.astro — Questions fréquentes
+  Balisage <details> / <summary> : accessible au clavier nativement.
+  L'ouverture est interceptée dans `animations.js` pour animer la hauteur
+  à la place du saut brutal du navigateur.
    ========================================================================= */
 
 /* --- DONNÉES : les questions --- */
@@ -12,50 +12,57 @@ const faqItems = [
   {
     question: 'Combien de temps faut-il pour créer mon site ?',
     answer:
-      'Comptez deux à quatre semaines entre notre premier échange et la mise en ligne, selon le nombre de pages et le temps nécessaire pour réunir vos textes et vos photos. Je vous donne un calendrier ferme au moment du devis.',
+      'Dès que j\'ai en ma possession l\'ensemble de vos contenus (textes, photos, accès), comptez 1 à 2 semaines pour réaliser votre site.',
   },
   {
     question: "Que se passe-t-il si je n'ai ni textes ni photos ?",
     answer:
-      "C'est le cas le plus courant. Je vous accompagne pour structurer et rédiger les textes, et je vous oriente vers un photographe local si les visuels manquent. Un site vitrine ne vaut que par la qualité de ce qu'il montre.",
+      "Si vous partez d'une page blanche, je rédige les textes les plus pertinents pour votre activité et votre référencement. Pour l'aspect visuel, je m'occupe de rechercher ou de générer des photos libres de droits adaptées à votre métier. La prestations de création d'image sont proposées en option avec une facturation supplémentaire.",
   },
   {
     question: 'Pourrai-je modifier mon site moi-même ?',
     answer:
-      'Oui. À la livraison, je vous forme aux modifications courantes : horaires, tarifs, textes, nouvelles photos. Pour les évolutions plus lourdes, je reste joignable.',
+      'Non, car je développe (code) votre site entièrement à la main. Pour vous libérer l\'esprit, je propose un forfait de maintenance comprenant jusqu\'à 3 modifications par mois. Vous gagnez du temps pour gérer votre activité, je m\'occupe du site.',
   },
   {
-    question: 'Le référencement local est-il inclus ?',
+    question: 'Le SEO local est-il inclus ?',
     answer:
-      "Oui, il fait partie du travail, pas d'une option : structure technique propre, données structurées, contenus orientés sur vos prestations et votre secteur, et mise en cohérence de votre fiche Google Business.",
+      "Oui, le SEO local est inclus. J'optimise votre site dès sa conception pour booster votre visibilité sur Google. Gardez cependant en tête que le référencement naturel est un travail de fond : il faut généralement plusieurs mois avant d'avoir des résultats.",
   },
   {
     question: 'Y a-t-il un abonnement mensuel ?',
     answer:
-      "Aucun abonnement obligatoire. Vous êtes propriétaire de votre site et de votre nom de domaine. L'hébergement et le domaine de la première année sont inclus ; ensuite, vous choisissez de les gérer vous-même ou de me confier la maintenance.",
+      "Non, aucun abonnement mensuel n'est requis pour maintenir votre site en ligne. Une fois le site créé et livré, il vous appartient définitivement. Vous restez totalement libre.",
   },
   {
     question: 'Travaillez-vous uniquement à Roanne ?',
     answer:
-      "Je suis basé près de Roanne et j'intervienne volontiers dans toute la Loire, en rendez-vous sur place. Au-delà du département, le travail se fait à distance, sans que cela change quoi que ce soit au résultat.",
+      "Je suis implantée à Roanne et privilégie la proximité avec les acteurs de la Loire, mais je collabore également avec des clients dans toute la France et à l'étranger. La distance n'est pas un frein pour créer le site web dont vous avez besoin.",
   },
 ];
 ---
 
-<section id="faq" class="border-b border-carbon/10">
-  <div
-    class="mx-auto max-w-[1600px] px-6 py-24 md:px-10 lg:grid lg:grid-cols-[1fr_2fr] lg:gap-20 lg:px-16 lg:py-32 xl:px-24"
-  >
-    {/* --- Titre de section, au même gabarit que les autres H2 --- */}
-    <h2
-      data-anim
-      class="font-display text-[clamp(2rem,4.5vw,3.5rem)] font-bold leading-[1.05] tracking-[-0.03em] text-carbon"
-    >
-      Questions Fréquentes.
-    </h2>
+<section id="faq" data-anim-line class="filet-b">
+  {/* ==================================================================
+      BANDEAU DE TITRE — pleine largeur, fermé par son propre filet.
+      Le filet du dessus est la bordure basse de la section précédente :
+      aucune section ne porte de `border-t`, sinon les traits doubleraient.
+      ================================================================== */}
+  <div data-anim-line class="filet-b">
+    <div class="mx-auto max-w-[1600px] px-6 pt-24 pb-16 md:px-10 lg:px-16 lg:pt-32 lg:pb-20 xl:px-24">
+      <h2
+        data-anim
+        class="font-display text-[clamp(2rem,4.5vw,3.5rem)] font-bold leading-[1.05] tracking-[-0.03em] text-carbon"
+      >
+        Questions Fréquentes<span class="text-accent">.</span>
+      </h2>
+    </div>
+  </div>
 
-    {/* --- Liste d'accordéons, séparés par des filets horizontaux fins --- */}
-    <div class="mt-12 border-t border-carbon/10 lg:mt-0">
+  <div class="mx-auto max-w-[1600px] px-6 py-24 md:px-10 lg:px-16 lg:py-32 xl:px-24">
+    {/* --- Liste d'accordéons, séparés par des filets horizontaux fins ---
+        Plus de `border-t` ici : le filet du bandeau ferme déjà le haut. */}
+    <div data-anim>
       {
         faqItems.map((item) => (
           <details data-faq class="group border-b border-carbon/10">

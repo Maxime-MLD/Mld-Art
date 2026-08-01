@@ -1,76 +1,142 @@
 ---
 /* =========================================================================
-   Hero.astro — Section d'ouverture
-   Grille asymétrique 45 / 55 séparée par un filet vertical fin.
-   Mobile : colonne unique, le visuel remonte au-dessus du texte et le filet
-   vertical devient horizontal.
+  Hero.astro — Section d'ouverture
+  Le Hero occupe la hauteur de fenêtre restante sous la navbar.
+  Structure : trois filets VERTICAUX calés sur le conteneur du site — le
+  même que celui de la navbar (max-w-[1600px] + px-6/10/16/24). Le filet de
+  gauche tombe donc exactement sous le bord gauche du logo, celui de droite
+  sous le bord droit du bouton « ME CONTACTER ».
+  Un unique filet HORIZONTAL ferme la section, sur toute la largeur d'écran.
    ========================================================================= */
 
 import { Image } from 'astro:assets';
 
 /* --- VISUEL D'OUVERTURE ---
-   Importé depuis src/assets pour être optimisé par astro:assets (WebP +
+  Importé depuis src/assets pour être optimisé par astro:assets (WebP +
    tailles multiples), ce qui compte directement pour le LCP. */
-// TODO: remplacer par le visuel définitif (format vertical, min. 1200 × 1600)
-import heroVisual from '../assets/placeholders/hero.jpg';
+// TODO: remplacer par le visuel définitif (format vertical, ratio 3/4, min. 1200 × 1600)
+import heroVisual from '../assets/placeholders/hero.png';
 ---
 
+{/* Le filet horizontal de fermeture est porté par la section : il traverse
+    donc tout l'écran, contrairement aux filets verticaux qui s'arrêtent au
+    conteneur. Hauteur de fenêtre moins la navbar : 80px (h-20) + 1px de
+    bordure en mobile, 96px (h-24) + 1px à partir de lg. */}
 <section id="accueil" class="border-b border-carbon/10">
-  <div class="mx-auto grid max-w-[1600px] lg:grid-cols-[45fr_55fr]">
+  <div
+    class="mx-auto flex min-h-[calc(100svh_-_81px)] max-w-[1600px] px-6 md:px-10 lg:min-h-[calc(100svh_-_97px)] lg:px-16 xl:px-24"
+  >
     {/* ==================================================================
-        COLONNE GAUCHE (45 %) — Titre, sous-texte, CTA principal
-        `order-2` sur mobile : le texte passe sous le visuel.
+        CONTENEUR DE RÉFÉRENCE
+        Sa largeur est exactement la zone de contenu de la navbar : c'est lui
+        qui sert d'origine aux filets. Étiré sur toute la hauteur par le flex
+        parent, il centre son contenu verticalement.
         ================================================================== */}
-    <div
-      class="order-2 flex flex-col justify-center px-6 py-20 md:px-10 md:py-24 lg:order-1 lg:px-16 lg:py-32 xl:px-24"
-    >
-      {/* Titre principal — unique H1 de la page, taille fluide */}
-      <h1
-        data-anim
-        class="font-display text-[clamp(2.75rem,6vw,5rem)] font-bold leading-[0.95] tracking-[-0.03em] text-carbon"
+    <div class="relative flex w-full items-center">
+      {/* --- Calque de filets verticaux (décoratif) ---
+          Masqué sous lg : en colonne unique, un trait vertical passerait
+          derrière le titre et le texte. */}
+      <div
+        aria-hidden="true"
+        class="pointer-events-none absolute inset-0 z-0 hidden lg:block"
       >
-        L'art du site vitrine.
-      </h1>
-
-      {/* Sous-texte — Inter, mesure courte et aérée */}
-      <p data-anim class="mt-10 max-w-md font-body text-base leading-relaxed text-carbon/70 md:text-lg">
-        Je conçois des sites vitrines sur-mesure pour les artisans et les
-        entreprises de Roanne et de la Loire. Chaque projet est traité comme une
-        pièce unique : design sobre, chargement instantané, référencement local
-        soigné.
-      </p>
-
-      {/* CTA principal — fond accent, texte carbon (contraste AA), angles droits */}
-      <div data-anim class="mt-12">
-        <a
-          href="#contact"
-          class="inline-block bg-accent px-8 py-4 font-body text-xs font-medium uppercase tracking-[0.18em] text-carbon transition-colors duration-300 hover:bg-carbon hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-        >
-          Démarrer un projet
-        </a>
+        {/* `data-hero-filet` : ces trois traits se déploient du haut vers le
+            bas au tout début de la séquence d'entrée (voir animations.js). */}
+        {/* Filet 1 — bord gauche du conteneur, sous le logo */}
+        <div data-hero-filet class="absolute inset-y-0 left-0 w-px bg-carbon/10"></div>
+        {/* Filet 2 — milieu du conteneur */}
+        <div data-hero-filet class="absolute inset-y-0 left-1/2 w-px bg-carbon/10"></div>
+        {/* Filet 3 — bord droit du conteneur, sous le bouton de la navbar */}
+        <div data-hero-filet class="absolute inset-y-0 right-0 w-px bg-carbon/10"></div>
       </div>
-    </div>
 
-    {/* ==================================================================
-        COLONNE DROITE (55 %) — Grand visuel vertical
-        Filet vertical à gauche en desktop (`lg:border-l`), filet horizontal
-        en dessous sur mobile (`border-b`), puisque le visuel passe au-dessus.
-        ================================================================== */}
-    <div
-      class="order-1 border-b border-carbon/10 px-6 py-12 md:px-10 lg:order-2 lg:border-b-0 lg:border-l lg:px-16 lg:py-32 xl:px-24"
-    >
-      {/* Cadre : filet fin anthracite + overflow-hidden pour que la bordure
-          reste immobile lors des futurs micro-zooms */}
-      <div class="overflow-hidden border border-carbon/20">
-        <Image
-          src={heroVisual}
-          alt="Aperçu d'un site vitrine réalisé par MLD DEV, présenté en format vertical"
-          widths={[600, 900, 1200]}
-          sizes="(min-width: 1024px) 55vw, 100vw"
-          loading="eager"
-          fetchpriority="high"
-          class="block aspect-[3/4] w-full object-cover"
-        />
+      {/* ================================================================
+          CONTENU — passe au-dessus du calque
+          Deux colonnes égales : la césure tombe donc sur le filet du milieu.
+          `items-center` : le bloc de texte est centré sur la hauteur du visuel,
+          et non aligné sur son bord haut.
+          ================================================================ */}
+      <div
+        class="relative z-10 grid w-full grid-cols-1 items-center gap-14 py-16 md:py-20 lg:grid-cols-2 lg:gap-0 lg:py-0"
+      >
+        {/* --------------------------------------------------------------
+            COLONNE TEXTE — collée au filet de gauche, sans indentation
+            `order-last` sous lg : le visuel passe systématiquement au-dessus.
+            -------------------------------------------------------------- */}
+        <div
+          class="order-last flex flex-col items-center text-center lg:order-none lg:items-start lg:pr-10 lg:text-left"
+        >
+          {/* Titre principal — unique H1 de la page, sur deux lignes forcées.
+              `text-wrap: initial` neutralise le `balance` posé sur tous les
+              titres dans global.css : la coupe est décidée par le <br>, pas
+              par le navigateur. */}
+          {/* Chaque ligne vit dans son propre masque `overflow-hidden` : le
+              texte est révélé en remontant depuis le bas du masque, sans
+              variation d'opacité. Les trois lignes sont écrites à la main
+              plutôt que découpées par un plugin — le texte est connu, c'est
+              plus fiable et il reste lisible sans JavaScript. */}
+          <h1
+            class="font-display text-[clamp(3rem,6.5vw,5.5rem)] font-extrabold leading-[0.9] tracking-[-0.03em] text-carbon [text-wrap:initial]"
+          >
+            <span class="block overflow-hidden">
+              <span data-hero-line class="block">Création de</span>
+            </span>
+            <span class="block overflow-hidden">
+              <span data-hero-line class="block">site web à</span>
+            </span>
+            <span class="block overflow-hidden">
+              <span data-hero-line class="block">
+                Roanne<span class="text-accent">.</span>
+              </span>
+            </span>
+          </h1>
+
+          {/* Sous-texte — mesure courte, trois lignes maximum */}
+          <p data-hero-fade class="mt-8 max-w-md font-body text-base leading-relaxed text-carbon/70">
+            Sublimez votre activité avec un site internet unique au design soigné. Une identité visuelle moderne et sur-<br class="hidden">mesure, pensée pour valoriser votre travail <br class="hidden"> et générer des demandes de devis.
+          </p>
+
+          {/* CTA principal — aplat orange, texte carbon (contraste 5,93:1) */}
+          <div data-hero-fade class="mt-10">
+            <a
+              href="#contact"
+              class="inline-block rounded-none bg-accent px-8 py-4 font-body text-xs font-medium uppercase tracking-wider text-carbon transition duration-300 hover:brightness-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              Lancer mon projet
+            </a>
+          </div>
+        </div>
+
+        {/* --------------------------------------------------------------
+            COLONNE VISUEL — entre le filet du milieu et celui de droite
+            La largeur est dérivée de la hauteur visée (75 % de la section)
+            via le ratio 3/4, puis bornée à la largeur de colonne par `min()`.
+            Le cadre ne peut donc jamais franchir un filet, quelle que soit la
+            proportion de la fenêtre.
+            -------------------------------------------------------------- */}
+        <div class="order-first flex justify-center lg:order-none">
+          {/* Cadre : un seul filet fin anthracite, angles droits, aucune ombre */}
+          <div
+            class="w-full max-w-[16rem] overflow-hidden rounded-none border border-carbon sm:max-w-xs lg:w-[min(calc((100svh_-_97px)*0.5625),100%)] lg:max-w-none"
+          >
+            {/* Conteneur intérieur : c'est LUI que la séquence d'entrée
+                dévoile en `clip-path`, le cadre extérieur ne bouge pas d'un
+                pixel. */}
+            <div data-hero-mask class="overflow-hidden">
+              {/* TODO: remplacer par le visuel définitif */}
+              <Image
+                src={heroVisual}
+                alt="Aperçu d'un site vitrine réalisé par MLD DEV, présenté en format vertical"
+                widths={[480, 960]}
+                sizes="(min-width: 1024px) 480px, 260px"
+                loading="eager"
+                fetchpriority="high"
+                data-hero-image
+                class="block aspect-[3/4] w-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

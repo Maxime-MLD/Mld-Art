@@ -1,32 +1,32 @@
 ---
 /* =========================================================================
-   Watermark.astro — Élément signature du site
-   « MLD DEV. » géant, collé aux quatre bords du bas de page : le M touche
-   l'extrême gauche, le point l'extrême droite, la base des lettres est
-   collée au bas du bloc.
-   -------------------------------------------------------------------------
-   Pourquoi un SVG et pas une <div> en font-size: 20vw :
-   la largeur rendue d'un texte dépend des métriques de la police et ne
-   tomberait jamais pile sur les deux bords. Ici, `textLength` impose la
-   largeur d'avance du texte, et le viewBox est calculé à partir des
-   métriques réelles de la fonte pour que l'ENCRE — pas la boîte d'avance —
-   affleure exactement les bords.
+  Watermark.astro — Élément signature du site
+  « MLD DEV. » géant, collé aux quatre bords du bas de page : le M touche
+  l'extrême gauche, le point l'extrême droite, la base des lettres est
+  collée au bas du bloc.
+  -------------------------------------------------------------------------
+  Pourquoi un SVG et pas une <div> en font-size: 20vw :
+  la largeur rendue d'un texte dépend des métriques de la police et ne
+  tomberait jamais pile sur les deux bords. Ici, `textLength` impose la
+  largeur d'avance du texte, et le viewBox est calculé à partir des
+  métriques réelles de la fonte pour que l'ENCRE — pas la boîte d'avance —
+  affleure exactement les bords.
    ========================================================================= */
 
 /* --- MÉTRIQUES DE LA FONTE ---
-   Relevées sur Plus Jakarta Sans 800 via l'API canvas TextMetrics, puis
-   ramenées à une base de 100 unités de font-size.
-   Pour les remesurer après un changement de police :
-     const ctx = document.createElement('canvas').getContext('2d');
-     ctx.font = '800 310px "Plus Jakarta Sans"';
-     const m = ctx.measureText('MLD DEV.');
+  Relevées sur Plus Jakarta Sans 800 via l'API canvas TextMetrics, puis
+  ramenées à une base de 100 unités de font-size.
+  Pour les remesurer après un changement de police :
+    const ctx = document.createElement('canvas').getContext('2d');
+    ctx.font = '800 310px "Plus Jakarta Sans"';
+    const m = ctx.measureText('MLD DEV.');
      // puis diviser chaque valeur par 3.10
-   Calibrées à 310px, soit la taille de rendu réelle du watermark sur un
-   écran de 1440px : les approches d'encre varient de ±0,5 % selon la taille
-   (arrondi du rastériseur au quart de pixel) et convergent au-delà de 300px.
-   Sur mobile, l'encre dépasse alors le viewBox d'un demi-pixel, rogné sans
-   effet visible — préférable à un jour visible au bord.
-   NB : la fonte n'existe pas en graisse 900 (elle plafonne à 800), c'est donc
+  Calibrées à 310px, soit la taille de rendu réelle du watermark sur un
+  écran de 1440px : les approches d'encre varient de ±0,5 % selon la taille
+  (arrondi du rastériseur au quart de pixel) et convergent au-delà de 300px.
+  Sur mobile, l'encre dépasse alors le viewBox d'un demi-pixel, rogné sans
+  effet visible — préférable à un jour visible au bord.
+  NB : la fonte n'existe pas en graisse 900 (elle plafonne à 800), c'est donc
    le 800 qui est mesuré et déclaré. */
 const METRICS = {
   advance: 477.6, // largeur d'avance totale (métrique stable à toute taille)
@@ -37,8 +37,8 @@ const METRICS = {
 };
 
 /* --- CALCUL DU GABARIT ---
-   On met à l'échelle pour que la largeur d'ENCRE fasse exactement 1000
-   unités, soit la largeur du viewBox. */
+  On met à l'échelle pour que la largeur d'ENCRE fasse exactement 1000
+  unités, soit la largeur du viewBox. */
 const inkWidth = METRICS.inkRight - METRICS.inkLeft;
 const scale = 1000 / inkWidth;
 
@@ -76,7 +76,7 @@ const round = (value: number) => Number(value.toFixed(2));
       fill="currentColor"
       >MLD DEV{/* Point final en accent, comme sur le logo. Le tspan ne change
       rien à la géométrie : `textLength` porte sur l'ensemble du texte. */}<tspan
-        class="fill-accent">.</tspan
+        class="fill-accent/50">.</tspan
       ></text
     >
   </svg>

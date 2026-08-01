@@ -1,9 +1,9 @@
 ---
 /* =========================================================================
-   Contact.astro — Prise de contact
-   Deux colonnes séparées par un filet vertical fin : accroche et coordonnées
-   à gauche, formulaire Web3Forms à droite.
-   La soumission passe par fetch : on ne quitte jamais la page.
+  Contact.astro — Prise de contact
+  Deux colonnes séparées par un filet vertical fin : accroche et coordonnées
+  à gauche, formulaire Web3Forms à droite.
+  La soumission passe par fetch : on ne quitte jamais la page.
    ========================================================================= */
 
 /* --- CLÉ D'ACCÈS WEB3FORMS ---
@@ -20,25 +20,31 @@ const labelClasses =
   'block font-body text-xs uppercase tracking-wider text-carbon/65';
 ---
 
-<section id="contact" class="border-b border-carbon/10">
+<section id="contact" data-anim-line class="filet-b">
+  {/* ==================================================================
+      BANDEAU DE TITRE — pleine largeur, fermé par son propre filet.
+      Le filet du dessus est la bordure basse de la section précédente :
+      aucune section ne porte de `border-t`, sinon les traits doubleraient.
+      ================================================================== */}
+  <div data-anim-line class="filet-b">
+    <div class="mx-auto max-w-[1600px] px-6 pt-24 pb-16 md:px-10 lg:px-16 lg:pt-32 lg:pb-20 xl:px-24">
+      <h2
+        data-anim
+        class="font-display text-[clamp(2rem,4.5vw,3.5rem)] font-bold leading-[1.05] tracking-[-0.03em] text-carbon"
+      >
+        Lançons votre projet<span class="text-accent">.</span>
+      </h2>
+    </div>
+  </div>
+
   <div class="mx-auto grid max-w-[1600px] lg:grid-cols-[2fr_3fr]">
     {/* ==================================================================
         COLONNE GAUCHE — accroche et coordonnées
         ================================================================== */}
     <div class="px-6 py-24 md:px-10 lg:px-16 lg:py-32 xl:px-24">
-      {/* Titre de section */}
-      <h2
-        data-anim
-        class="font-display text-[clamp(2rem,4.5vw,3.5rem)] font-bold leading-[1.05] tracking-[-0.03em] text-carbon"
-      >
-        Lançons votre projet.
-      </h2>
-
       {/* Accroche courte */}
-      <p class="mt-8 max-w-md font-body text-base leading-relaxed text-carbon/70">
-        Décrivez-moi votre métier et ce que vous attendez de votre site. Je vous
-        réponds sous 24 heures ouvrées, avec un premier avis honnête sur ce qui
-        est pertinent — ou non — pour votre activité.
+      <p class="max-w-md font-body text-base leading-relaxed text-carbon/70">
+        Parlez-moi de votre activité et de vos objectifs. Je vous réponds sous 24h ouvrées avec un retour concret et honnête sur ce qui boostera vraiment votre visibilité.
       </p>
 
       {/* Coordonnées minimalistes */}
@@ -49,10 +55,10 @@ const labelClasses =
           <dd class="mt-2 font-body text-base text-carbon">
             {/* TODO: téléphone */}
             <a
-              href="tel:+33000000000"
+              href="tel:+330662599771"
               class="border-b border-transparent transition-colors duration-300 hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
-              00 00 00 00 00
+              06 62 59 97 71
             </a>
           </dd>
         </div>
@@ -73,7 +79,7 @@ const labelClasses =
 
         {/* Adresse */}
         <div>
-          <dt class={labelClasses}>Atelier</dt>
+          <dt class={labelClasses}>Agence</dt>
           <dd class="mt-2 font-body text-base leading-relaxed text-carbon">
             {/* TODO: adresse */}
             Roanne, Loire (42)
@@ -89,7 +95,13 @@ const labelClasses =
     <div
       class="border-t border-carbon/10 px-6 py-24 md:px-10 lg:border-t-0 lg:border-l lg:px-16 lg:py-32 xl:px-24"
     >
-      <form id="contact-form" action="https://api.web3forms.com/submit" method="POST" novalidate>
+      <form
+        id="contact-form"
+        data-anim
+        action="https://api.web3forms.com/submit"
+        method="POST"
+        novalidate
+      >
         {/* --- Champs techniques Web3Forms --- */}
         <input type="hidden" name="access_key" value={web3formsKey} />
         <input
@@ -195,7 +207,7 @@ const labelClasses =
 
 <script>
   /* -----------------------------------------------------------------------
-     Envoi du formulaire sans quitter la page
+    Envoi du formulaire sans quitter la page
      ----------------------------------------------------------------------- */
   const form = document.getElementById('contact-form') as HTMLFormElement | null;
   const submitButton = document.getElementById('contact-submit') as HTMLButtonElement | null;

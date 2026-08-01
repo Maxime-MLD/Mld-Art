@@ -1,8 +1,8 @@
 ---
 /* =========================================================================
-   Footer.astro — Pied de page
-   Grand espace vide au-dessus, encadré de filets fins, puis deux colonnes
-   de liens, la ligne de copyright, et le watermark signature collé au bas.
+  Footer.astro — Pied de page
+  Grand espace vide au-dessus, encadré de filets fins, puis deux colonnes
+  de liens, la ligne de copyright, et le watermark signature collé au bas.
    ========================================================================= */
 
 import Watermark from './Watermark.astro';
@@ -18,10 +18,9 @@ const navLinks = [
 /* --- DONNÉES : liens externes --- */
 // TODO: URLs réelles des réseaux sociaux et de la fiche Google Maps
 const socialLinks = [
-  { label: 'Instagram', href: '#' },
-  { label: 'TikTok', href: '#' },
-  { label: 'LinkedIn', href: '#' },
-  { label: 'Google Maps', href: '#' },
+  { label: 'Instagram', href: 'https://www.instagram.com/mld_developpement?utm_source=qr' },
+  { label: 'Google', href: 'https://www.google.com/maps/place//data=!4m3!3m2!1s0x818e7c397bc4f969:0xab4357d73b8f262f!12e1?source=g.page.m._&laa=merchant-review-solicitation' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/maxime-lagraa-4a4299386' },
 ];
 
 /* Année calculée au build : le copyright ne se périme pas tout seul. */
@@ -31,7 +30,9 @@ const linkClasses =
   'font-body text-sm text-carbon transition-colors duration-300 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
 ---
 
-<footer class="border-t border-carbon/10">
+{/* Aucun filet haut ici : la bordure basse de la section Contact fait déjà
+    cette ligne. En porter un second donnerait un trait de 2px. */}
+<footer>
   <div class="mx-auto max-w-[1600px] px-6 md:px-10 lg:px-16 xl:px-24">
     {/* ==================================================================
         GRAND ESPACE VIDE puis les deux colonnes de liens
@@ -58,7 +59,7 @@ const linkClasses =
       {/* --- Colonne 2 : liens externes, textuels et sans icône --- */}
       <div>
         <p class="font-body text-xs uppercase tracking-wider text-carbon/65">
-          Suivre l'atelier
+          Suivre l'agence
         </p>
         <ul class="mt-8 space-y-4">
           {
@@ -89,9 +90,11 @@ const linkClasses =
       {/* Copyright — le second « MLD DEV » renvoie vers le site */}
       <p class="font-body text-xs leading-relaxed text-carbon/65">
         © {currentYear} MLD DEV. Tous droits réservés. Site créé par{' '}
+        {/* Souligné : au milieu d'un bloc de texte, un lien ne peut pas se
+            distinguer par la seule couleur (critère WCAG 1.4.1). */}
         <a
           href="https://www.mld-dev.com"
-          class="text-carbon transition-colors duration-300 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          class="text-carbon underline decoration-1 underline-offset-4 transition-colors duration-300 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           MLD DEV
         </a>

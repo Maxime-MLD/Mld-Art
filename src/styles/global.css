@@ -70,6 +70,48 @@
 }
 
 /* -------------------------------------------------------------------------
+   FILETS DE STRUCTURE ANIMABLES
+   Une bordure CSS ne peut pas se déployer de 0 à 100 % : `scaleX` s'applique
+   à l'élément entier, pas à son trait. Le filet est donc dessiné par un
+   pseudo-élément, dont l'échelle est pilotée par la variable `--filet`.
+   GSAP anime cette variable ; le reste du bloc ne bouge pas d'un pixel.
+   ⚠️ Ces utilitaires imposent `position: relative` : ne pas les appliquer à
+   un élément déjà positionné (la Navbar est `sticky`, elle garde donc une
+   bordure classique).
+   ------------------------------------------------------------------------- */
+@utility filet-b {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    background-color: color-mix(in srgb, var(--color-carbon) 10%, transparent);
+    transform: scaleX(var(--filet, 1));
+    transform-origin: left center;
+  }
+}
+
+@utility filet-t {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 1px;
+    background-color: color-mix(in srgb, var(--color-carbon) 10%, transparent);
+    transform: scaleX(var(--filet, 1));
+    transform-origin: left center;
+  }
+}
+
+/* -------------------------------------------------------------------------
    LENIS — styles requis par le smooth scroll
    (repris de la doc officielle : sans ça, le scroll se bloque)
    ------------------------------------------------------------------------- */
@@ -104,19 +146,123 @@ html.lenis body {
     scroll-behavior: auto !important;
   }
 
-  /* Les éléments préparés pour une animation d'entrée sont affichés d'emblée */
+  /* Les éléments préparés pour une animation d'entrée sont affichés d'emblée,
+     et les filets sont déployés à 100 % sans transition */
   [data-anim],
   [data-anim-line] {
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  [data-anim-line] {
+    --filet: 1 !important;
+  }
+
+  /* Séquence d'entrée : tout est directement à l'état final */
+  .js [data-nav-item],
+  .js [data-hero-line],
+  .js [data-hero-fade],
+  .js [data-hero-image],
+  .js [data-hero-filet] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .js [data-hero-mask] {
+    clip-path: none !important;
   }
 }
 
 /* -------------------------------------------------------------------------
    ÉTAT INITIAL DES ANIMATIONS
    Déclaré en CSS pour éviter tout flash de contenu non animé (FOUC)
-   avant l'initialisation de GSAP. Complété en Phase 7.
+   avant l'initialisation de GSAP.
    ------------------------------------------------------------------------- */
 [data-anim] {
   opacity: 0;
+}
+
+/* Filet replié : il se déploiera de la gauche vers la droite */
+[data-anim-line] {
+  --filet: 0;
+}
+
+/* -------------------------------------------------------------------------
+   SÉQUENCE D'ENTRÉE — états initiaux
+   Scopés à `.js`, posée par un script synchrone dans le <head> : sans
+   JavaScript, aucune de ces règles ne s'applique et la page reste lisible.
+   Ils sont déclarés en CSS et non en JS pour éviter le flash — les éléments
+   ne doivent jamais apparaître à leur position finale avant l'animation.
+   ------------------------------------------------------------------------- */
+
+/* Éléments de la navbar : ils descendent sur la barre, qui elle ne bouge pas */
+.js [data-nav-item] {
+  opacity: 0;
+  transform: translateY(-24px);
+}
+
+/* Lignes du H1 : hors du masque, sous sa limite basse */
+.js [data-hero-line] {
+  transform: translateY(110%);
+}
+
+/* Sous-texte et bouton du Hero.
+   ⚠️ Ce paragraphe est l'élément LCP de la page. Le masquer jusqu'au
+   démarrage de la séquence coûte 1,1 s de LCP et 2 points de Lighthouse
+   mobile (98 au lieu de 100), mesuré. Animer `y` sans `opacity` rendrait
+   ces 2 points, l'élément étant alors peint dès le premier rendu. */
+.js [data-hero-fade] {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Visuel du Hero : le conteneur intérieur est entièrement rogné,
+   l'image est légèrement agrandie pour se résorber pendant la révélation */
+.js [data-hero-mask] {
+  clip-path: inset(100% 0 0 0);
+}
+
+.js [data-hero-image] {
+  transform: scale(1.12);
+}
+
+/* Filets verticaux du Hero : repliés vers le haut */
+.js [data-hero-filet] {
+  transform: scaleY(0);
+  transform-origin: top;
+}
+
+/* -------------------------------------------------------------------------
+   RÉALISATIONS — fondu de troncature des descriptions
+   Le fondu est un masque appliqué au texte lui-même, et non un calque de
+   dégradé posé par-dessus : rien ne recouvre le paragraphe, il n'y a donc
+   aucun raccord possible avec la couleur de fond.
+   FORMULE DES PALIERS : ils tombent sur les FRONTIÈRES entre lignes, jamais
+   au milieu, sinon une ligne se retrouverait coupée en deux dans son
+   épaisseur. Interligne effectif : `leading-relaxed` = 1,625em (26px pour un
+   corps de 16px).
+     · 2 × 1,625em = 3,25em → début de l'avant-dernière ligne
+     · 1 × 1,625em          → début de la dernière ligne
+   L'avant-dernière est donc légèrement estompée, la dernière nettement plus
+   — mais à 0,28 et non 0,12 : elle doit rester lisible en entier, jambages
+   descendants compris, pas s'effacer.
+   Recalculer ces deux valeurs si l'interligne change.
+   Scopé à `.js` : sans JavaScript le texte n'est pas tronqué, il ne doit
+   donc pas non plus être estompé.
+   ------------------------------------------------------------------------- */
+.js [data-desc-contenu] {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 calc(100% - 3.25em),
+    rgba(0, 0, 0, 0.6) calc(100% - 1.625em),
+    rgba(0, 0, 0, 0.28) 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 calc(100% - 3.25em),
+    rgba(0, 0, 0, 0.6) calc(100% - 1.625em),
+    rgba(0, 0, 0, 0.28) 100%
+  );
 }

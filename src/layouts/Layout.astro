@@ -20,6 +20,17 @@ import '@fontsource/inter/latin-500.css';             /* Labels & liens — Medi
    ce qui se voit sur les secteurs d'activité des réalisations. */
 import '@fontsource/inter/latin-400-italic.css';      /* Secteurs, mentions — Italic */
 
+/* --- PRÉCHARGEMENT DES DEUX POLICES CRITIQUES ---------------------------
+   Importées avec `?url` pour récupérer l'URL hachée générée au build.
+   Sans préchargement, ces fichiers ne sont découverts qu'après l'analyse du
+   CSS : `document.fonts.ready` met alors plus de deux secondes à se résoudre,
+   et c'est lui qui déclenche la séquence d'entrée — donc l'affichage du
+   texte du Hero, qui est l'élément LCP de la page.
+   Seules ces deux graisses sont préchargées : les autres servent plus bas
+   dans la page et entreraient en concurrence pour la bande passante. */
+import interRegular from '@fontsource/inter/files/inter-latin-400-normal.woff2?url';
+import jakartaExtraBold from '@fontsource/plus-jakarta-sans/files/plus-jakarta-sans-latin-800-normal.woff2?url';
+
 /* --- STYLES GLOBAUX (tokens @theme + base) ------------------------------- */
 import '../styles/global.css';
 
@@ -27,12 +38,17 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
+  /* Pages à exclure de l'index (mentions légales). Coupe aussi le JSON-LD :
+     les données structurées de l'établissement n'ont de sens que sur une page
+     indexable. */
+  noindex?: boolean;
 }
 
 const {
   title = 'MLD DEV — Création de sites vitrines à Roanne (Loire)',
   description =
     'MLD DEV, studio de création de sites vitrines à Roanne (Loire, 42). Des sites sur-mesure, rapides et soignés, pensés pour les artisans et entreprises locales.',
+  noindex = false,
 } = Astro.props;
 
 /* --- URL CANONIQUE ------------------------------------------------------- */
@@ -41,11 +57,91 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 /* --- IMAGE DE PARTAGE (Open Graph / Twitter) ----------------------------- */
 /* TODO: remplacer par le visuel de partage définitif (1200 × 630 px) */
 const ogImage = new URL('/placeholders/og-image.jpg', Astro.site);
+
+/* --- DONNÉES STRUCTURÉES — SEO LOCAL ------------------------------------
+   C'est ce bloc qui porte réellement le référencement local, pas les balises
+   geo.* ci-dessous. Type ProfessionalService : l'activité est un service
+   professionnel rendu depuis un établissement identifié.
+   ------------------------------------------------------------------------ */
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: 'MLD DEV',
+  url: 'https://www.mld-dev.com',
+  description,
+  image: ogImage.href,
+  // Fourchette indicative : ni un tarif, ni un engagement contractuel
+  priceRange: '€€',
+  // TODO: numéro de téléphone réel, au format international
+  telephone: '+330662599771',
+  // TODO: email de contact réel
+  email: 'contact@mld-dev.com',
+  founder: {
+    '@type': 'Person',
+    name: 'Maxime',
+  },
+  address: {
+    '@type': 'PostalAddress',
+    // TODO: adresse exacte (numéro et voie)
+    streetAddress: '',
+    addressLocality: 'Roanne',
+    postalCode: '42300',
+    addressRegion: 'Loire',
+    addressCountry: 'FR',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: 46.0368,
+    longitude: 4.0689,
+  },
+  // Zone d'intervention : les deux communes visées en priorité, puis le département
+  areaServed: [
+    { '@type': 'City', name: 'Roanne' },
+    { '@type': 'City', name: 'Vougy' },
+    { '@type': 'AdministrativeArea', name: 'Loire' },
+  ],
+  // TODO: URLs réelles des profils (Instagram, TikTok, LinkedIn, Google Maps)
+  sameAs: ["https://share.google/iPUpPpEwiIYH8XEDV","https://www.linkedin.com/in/maxime-lagraa-4a4299386",],
+};
+
+/* Les champs encore vides sont retirés avant sérialisation : une propriété
+   `streetAddress: ""` ou un `sameAs: []` déclenchent des avertissements dans
+   les outils de test de données structurées. Ils réapparaîtront d'eux-mêmes
+   une fois les TODO ci-dessus renseignés. */
+function retirerChampsVides(valeur) {
+  if (Array.isArray(valeur)) {
+    return valeur.length > 0 ? valeur : undefined;
+  }
+  if (valeur && typeof valeur === 'object') {
+    const nettoye = Object.fromEntries(
+      Object.entries(valeur)
+        .map(([cle, val]) => [cle, retirerChampsVides(val)])
+        .filter(([, val]) => val !== undefined)
+    );
+    return Object.keys(nettoye).length > 0 ? nettoye : undefined;
+  }
+  return valeur === '' ? undefined : valeur;
+}
+
+const structuredDataPropre = retirerChampsVides(structuredData);
 ---
 
 <!doctype html>
 <html lang="fr">
   <head>
+    {/* --- Anti-flash de la séquence d'entrée ---
+        Script synchrone, exécuté avant le premier rendu : il marque le
+        document comme « JavaScript actif ». Les états initiaux masqués sont
+        scopés à cette classe dans global.css, si bien que sans JS — ou si le
+        script échoue — la page s'affiche entièrement, sans rien d'invisible. */}
+    <script is:inline>document.documentElement.classList.add('js');</script>
+
+    {/* --- Préchargement des polices critiques ---
+        `crossorigin` est obligatoire sur les polices, même en même origine :
+        sans lui le navigateur télécharge le fichier une seconde fois. */}
+    <link rel="preload" as="font" type="font/woff2" href={interRegular} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={jakartaExtraBold} crossorigin />
+
     {/* --- Métadonnées techniques de base --- */}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -55,6 +151,7 @@ const ogImage = new URL('/placeholders/og-image.jpg', Astro.site);
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
 
     {/* --- Open Graph (Facebook, LinkedIn, WhatsApp…) --- */}
     <meta property="og:type" content="website" />
@@ -83,16 +180,30 @@ const ogImage = new URL('/placeholders/og-image.jpg', Astro.site);
     {/* TODO: remplacer par le favicon définitif */}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    {/* TODO (Phase 8) : script JSON-LD ProfessionalService (SEO local) */}
+    {/* --- Données structurées JSON-LD (SEO local Roanne & Loire) --- */}
+    {
+      !noindex && (
+        <script
+          type="application/ld+json"
+          set:html={JSON.stringify(structuredDataPropre)}
+        />
+      )
+    }
+
+    {/* --- Animations : smooth scroll Lenis + GSAP (fichier unique) ---
+        Déclaré dans le <head> et non en fin de <body> : un script `type=
+        "module"` est différé de toute façon, il ne bloque donc pas l'analyse
+        du document, mais le scanner de préchargement le découvre aussitôt au
+        lieu d'attendre la fin du corps. Ce n'est pas cosmétique : le texte du
+        Hero — élément LCP de la page — reste masqué tant que ce module n'a
+        pas démarré la séquence d'entrée. */}
+    <script>
+      import '../scripts/animations.js';
+    </script>
   </head>
 
   <body class="bg-paper font-body text-carbon antialiased">
     {/* Le contenu de chaque page est injecté ici */}
     <slot />
-
-    {/* --- Animations : smooth scroll Lenis + GSAP (fichier unique) --- */}
-    <script>
-      import '../scripts/animations.js';
-    </script>
   </body>
 </html>
