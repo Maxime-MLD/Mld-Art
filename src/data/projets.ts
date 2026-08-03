@@ -72,8 +72,8 @@ export const projets: Projet[] = [
     projectUrl: "https://denis-soudure.vercel.app/",
   },
   {
-    title: "Cabinet dentaire",
-    category: "Cabinet Dentaire — Roanne",
+    title: "Cabinet Dentaire",
+    category: "Cabinet dentaire — Roanne",
     description:
       "Un design médical épuré et rassurant conçu pour ce cabinet basé à Roanne. L'utilisation de tons bleus apaisants et d'un visuel 3D percutant instaure immédiatement un climat de confiance, de professionnalisme et de haute technicité.",
 
