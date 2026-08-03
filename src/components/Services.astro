@@ -14,10 +14,13 @@ const services = [
   {
     title: 'Le Site Vitrine',
     description:
-      "Une page unique, percutante et rapide, pour installer votre présence sur le web. L'essentiel concentré au même endroit, qui vous êtes, ce que vous faites et comment vous contacter pour générer vos premiers clients.",
+      "Une page unique, rapide et percutante pour présenter votre activité, valoriser votre savoir-faire et guider vos visiteurs vers l’essentiel : vos services, vos coordonnées et une prise de contact simple.",
     price: '1000 €', // TODO: tarif réel
+    ctaLabel: 'Demander mon devis',
+    ctaHref: '#contact',
+    offre: 'site-vitrine',
     features: [
-      'Site une page, sur-mesure',
+      'Site une page, sur mesure',
       'Choix du design & couleurs',
       'Référencement (SEO) local Roanne & Loire',
       'Rédaction des textes accompagnée',
@@ -27,12 +30,15 @@ const services = [
     accent: 'price' as const,
   },
   {
-    title: 'Le Site Vitrine Multipage',
+    title: 'Le Site Vitrine Multipages',
     description:
-      'La formule complète, plusieurs pages pour détailler vos services, un référencement local travaillé pour être visible à Roanne et une direction artistique sur mesure au service de votre métier.',
+      'Un site complet avec plusieurs pages pour présenter vos services en détail, renforcer votre référencement local à Roanne et construire une identité visuelle sur mesure, fidèle à votre métier.',
     price: '1500 €', // TODO: tarif réel
+    ctaLabel: 'Demander mon devis',
+    ctaHref: '#contact',
+    offre: 'site-vitrine-multipages',
     features: [
-      'Jusqu’à cinq pages sur-mesure',
+      'Jusqu’à 5 pages sur-mesure',
       'Choix du design & couleurs',
       'Référencement (SEO) local Roanne & Loire',
       'Rédaction des textes accompagnée',
@@ -44,8 +50,14 @@ const services = [
   {
     title: 'La Refonte',
     description:
-      "Votre site actuel vous dessert ? Qu'il soit lent, daté ou invisible, il est temps de réagir. Ensemble, nous créons un design moderne et performant pour repartir sur de bonnes bases et capter enfin vos futurs clients.",
+      "Modernisez votre site avec un design plus actuel, une navigation claire et une expérience mobile fluide, tout en conservant vos contenus essentiels et les acquis de votre référencement.",
     price: 'sur devis', // TODO: tarif réel
+    /* Prestation chiffrée au cas par cas : « TTC » n'annonce rien tant qu'il
+       n'y a pas de montant. La mention est donc coupée sur cette carte. */
+    showTTC: false,
+    ctaLabel: 'Demander un audit gratuit',
+    ctaHref: '#contact',
+    offre: 'refonte',
     features: [
       'Audit technique et de performance',
       'Reprise de la structure et des contenus',
@@ -63,10 +75,14 @@ const services = [
 // TODO: ajuster la liste des prestations incluses dans chacune
 const complements = [
   {
-    title: 'Maintenance',
+    title: 'La Maintenance & L\'hébergement',
     description:
-      "Un site à jour, sécurisé et sauvegardé. Besoin de changer un texte ou une image ? Vous bénéficiez de 3 interventions par mois, d'une heure chacune, pour faire évoluer votre contenu.",
-    price: '30 € / mois',
+      "Un site hébergé, sécurisé, sauvegardé et toujours à jour. Vous bénéficiez aussi de trois interventions mensuelles d’une heure pour modifier vos textes, images ou contenus.",
+    price: '40 €',
+    pricePeriod: '/ mois',
+    ctaLabel: 'Souscrire à la maintenance',
+    ctaHref: '#contact',
+    offre: 'maintenance-hebergement',
     features: [
       'Jusqu’à trois interventions par mois',
       'Une heure d’intervention par demande',
@@ -77,10 +93,13 @@ const complements = [
     accent: 'price' as const,
   },
   {
-    title: 'Fiche Google',
+    title: 'La Fiche Google',
     description:
-      'Je crée et configure votre fiche d’établissement Google pour vous rendre visible dans les recherches locales et commencer à récolter des avis clients.',
+      'Je crée et optimise votre fiche d’établissement Google pour renforcer votre visibilité à Roanne, présenter vos informations essentielles et faciliter la collecte d’avis clients.',
     price: '200 €',
+    ctaLabel: 'Optimiser ma fiche Google',
+    ctaHref: '#contact',
+    offre: 'fiche-google',
     features: [
       'Création et vérification de la fiche',
       'Catégories, horaires et zone d’intervention',
@@ -108,16 +127,22 @@ const complements = [
       Les filets sont obtenus par une gouttière de 1px (`gap-px`) laissant
       voir le fond `carbon/10` du conteneur : les lignes restent justes à
       tous les breakpoints, sans doublon ni filet orphelin.
-      1 colonne en mobile, 2 en tablette, 3 en desktop. */}
+      1 colonne en mobile, 2 en tablette, 3 en desktop.
+      Aucune carte n'a de traitement particulier : les colonnes ont toutes la
+      même largeur, et celle qui reste seule sur la dernière ligne en tablette
+      garde la largeur de sa colonne, alignée à gauche. Deux réglages s'en
+      chargent :
+      • `grid-cols-1 md:grid-cols-2 lg:grid-cols-3` pose des pistes en
+        `minmax(0, 1fr)`, donc de largeur imposée. Des pistes en `auto` se
+        seraient élargies au contenu — c'est exactement ce qui déformait la
+        dernière ligne ;
+      • `justify-items-start` empêche la carte orpheline de s'étendre sur la
+        ligne. Les cartes n'en remplissent pas moins leur colonne : leur
+        largeur au contenu est plafonnée à la piste, et un paragraphe suffit à
+        l'atteindre. */}
   <div data-anim-line class="filet-t">
     <div
-      class:list={[
-        'mx-auto grid max-w-[1600px] gap-px bg-carbon/10 md:grid-cols-2 lg:grid-cols-3',
-        /* Nombre impair de cartes : la dernière occupe toute la largeur en
-           tablette, sinon une case vide laisserait un aplat carbon/10. */
-        services.length % 2 === 1 &&
-          'md:[&>*:last-child]:col-span-2 lg:[&>*:last-child]:col-span-1',
-      ]}
+      class="mx-auto grid max-w-[1600px] grid-cols-1 justify-items-start gap-px bg-carbon/10 md:grid-cols-2 lg:grid-cols-3"
     >
       {
         services.map((service) => (
@@ -125,11 +150,29 @@ const complements = [
             title={service.title}
             description={service.description}
             price={service.price}
+            showTTC={service.showTTC}
             features={service.features}
+            ctaLabel={service.ctaLabel}
+            ctaHref={service.ctaHref}
+            offre={service.offre}
             accent={service.accent}
           />
         ))
       }
+
+      {/* Cale de fin de grille — nombre impair de cartes.
+          Le fond `carbon/10` du conteneur, qui dessine les filets dans les
+          gouttières, transparaît aussi dans la case laissée libre par la
+          dernière ligne en tablette : un aplat gris pleine hauteur à côté de
+          la carte. Cette cale le recouvre de papier, sans rien changer à la
+          carte, qui garde la largeur de sa colonne et son alignement à
+          gauche. `w-full` est nécessaire : sous `justify-items-start`, un
+          élément vide se réduirait à une largeur nulle et découvrirait de
+          nouveau l'aplat. Purement décorative, donc masquée aux lecteurs
+          d'écran, et inutile en desktop où les trois colonnes sont pleines. */}
+      {services.length % 2 === 1 && (
+        <div aria-hidden="true" class="hidden w-full bg-paper md:block lg:hidden"></div>
+      )}
     </div>
   </div>
 
@@ -162,7 +205,11 @@ const complements = [
             title={complement.title}
             description={complement.description}
             price={complement.price}
+            pricePeriod={complement.pricePeriod}
             features={complement.features}
+            ctaLabel={complement.ctaLabel}
+            ctaHref={complement.ctaHref}
+            offre={complement.offre}
             accent={complement.accent}
           />
         ))

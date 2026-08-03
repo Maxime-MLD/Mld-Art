@@ -12,7 +12,7 @@
 import { Picture } from 'astro:assets';
 
 /* TODO: remplacer par le visuel définitif */
-import visuelBanniere from '../assets/placeholders/banner.png';
+import visuelBanniere from '../assets/placeholders/banner-dezoom.png';
 
 /* --- GRAIN ---
    Généré en CSS, jamais incrusté dans le fichier image : il reste net à
@@ -98,13 +98,29 @@ const voileVertical = `background-image:linear-gradient(to top,${profilVertical}
     plafonne : sur un écran large, un 16/9 pur dépasserait 1000px de haut et
     mangerait tout le viewport. C'est `object-cover` qui absorbe l'écart.
     Sous md, un 16/9 donnerait une bande trop fine pour le texte : on passe
-    en 4/5, puis 16/10 en tablette. */}
+    en 4/5, puis 16/10 en tablette.
+
+    En desktop, le 21/9 est choisi pour tenir SOUS ce plafond : sur un écran
+    1920 × 1080, il demande 823px de haut pour 756px disponibles, là où un 16/9
+    en réclamait 1080 — soit 30 % de l'image sacrifiés au recadrage. Le format
+    panoramique laisse donc le visuel s'afficher quasi entièrement. */}
 <section
   data-banniere
-  class="relative w-full overflow-hidden border-b border-carbon/10 aspect-[4/5] max-h-[70vh] md:aspect-[16/10] lg:aspect-video"
+  class="relative w-full overflow-hidden border-b border-carbon/10 aspect-[4/5] max-h-[70vh] md:aspect-[16/10] lg:aspect-[21/9]"
 >
   {/* --- Visuel ---
-      En bas de page : chargement différé, décodage asynchrone. */}
+      En bas de page : chargement différé, décodage asynchrone.
+
+      `object-cover` à TOUS les breakpoints, et c'est un choix contraint :
+      `contain` garantissait l'absence de recadrage, mais au prix de bandes de
+      fond sur les côtés — 105px de chaque côté à 1440, 200px à 1920 — dès que
+      le fichier n'est pas EXACTEMENT au ratio du cadre. Or ce ratio n'est pas
+      fixe : `max-h-[70vh]` l'écrête différemment selon la hauteur d'écran, si
+      bien qu'aucun ratio de fichier ne peut coïncider partout.
+      Remplir toute la largeur et ne rien rogner sont donc incompatibles ici.
+      La garantie « aucun recadrage » vient du FICHIER, pas du CSS : cadré en
+      21/9, il n'est rogné que de quelques pour cent aux proportions extrêmes. */}
+  {/* TODO: recadrer le visuel en 21/9, largeur 2400px minimum */}
   <Picture
     src={visuelBanniere}
     alt="Une visiteuse observe un site web créé par MLD DEV, présenté comme une œuvre encadrée dans un musée"

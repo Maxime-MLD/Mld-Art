@@ -12,12 +12,24 @@
 const web3formsKey = import.meta.env.PUBLIC_WEB3FORMS_KEY ?? '';
 
 /* Classes communes aux champs : fond transparent, filet inférieur seul,
-   qui passe à l'accent au focus. Aucune boîte blanche. */
+   qui passe à l'accent au focus. Aucune boîte blanche.
+
+   Les deux variantes `aria-[invalid=true]` mettent la ligne en rouge tant que
+   l'erreur dure. La seconde est indispensable : sans elle, `focus:border-accent`
+   reprendrait la main dès que l'utilisateur revient dans le champ et l'erreur
+   passerait à l'orange. En doublant le sélecteur d'attribut sur `:focus`, la
+   règle d'erreur devient plus spécifique et l'emporte — l'erreur prime sur le
+   focus. */
 const fieldClasses =
-  'w-full border-b border-carbon/20 bg-transparent py-3 font-body text-base text-carbon transition-colors duration-300 placeholder:text-carbon/40 focus:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
+  'w-full border-b border-carbon/20 bg-transparent py-3 font-body text-base text-carbon transition-colors duration-300 placeholder:text-carbon/40 focus:border-accent aria-[invalid=true]:border-error focus:aria-[invalid=true]:border-error focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
 
 const labelClasses =
   'block font-body text-xs uppercase tracking-wider text-carbon/65';
+
+/* Message d'erreur sous un champ. `role="alert"` est posé dès le rendu, sur un
+   élément vide : les lecteurs d'écran annoncent alors le texte à l'instant où
+   il est inséré. */
+const errorClasses = 'mt-2 hidden font-body text-xs text-error';
 ---
 
 <section id="contact" data-anim-line class="filet-b">
@@ -44,7 +56,7 @@ const labelClasses =
     <div class="px-6 py-24 md:px-10 lg:px-16 lg:py-32 xl:px-24">
       {/* Accroche courte */}
       <p class="max-w-md font-body text-base leading-relaxed text-carbon/70">
-        Parlez-moi de votre activité et de vos objectifs. Je vous réponds sous 24h ouvrées avec un retour concret et honnête sur ce qui boostera vraiment votre visibilité.
+        Parlez-moi de votre activité, de vos objectifs et de votre projet. Je vous réponds sous 24 heures ouvrées avec un retour clair et honnête sur les solutions les plus pertinentes pour développer votre visibilité.
       </p>
 
       {/* Coordonnées minimalistes */}
@@ -136,6 +148,7 @@ const labelClasses =
               autocomplete="name"
               class:list={['mt-3', fieldClasses]}
             />
+            <p id="contact-name-erreur" role="alert" class={errorClasses}></p>
           </div>
 
           {/* --- Email --- */}
@@ -149,6 +162,7 @@ const labelClasses =
               autocomplete="email"
               class:list={['mt-3', fieldClasses]}
             />
+            <p id="contact-email-erreur" role="alert" class={errorClasses}></p>
           </div>
 
           {/* --- Message --- */}
@@ -161,24 +175,28 @@ const labelClasses =
               rows="5"
               class:list={['mt-3 resize-y', fieldClasses]}
             ></textarea>
+            <p id="contact-message-erreur" role="alert" class={errorClasses}></p>
           </div>
         </div>
 
         {/* --- Consentement RGPD — non coché par défaut, obligatoire --- */}
-        <div class="mt-10 flex gap-3">
-          <input
-            type="checkbox"
-            id="contact-consent"
-            name="consentement_rgpd"
-            required
-            value="Oui"
-            class="mt-0.5 h-4 w-4 shrink-0 accent-carbon focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-          />
-          <label for="contact-consent" class="font-body text-xs leading-relaxed text-carbon/70">
-            En soumettant ce formulaire, j'accepte que les données saisies soient
-            exploitées par MLD DEV dans le cadre de ma demande et de la relation
-            commerciale qui peut en découler.
-          </label>
+        <div class="mt-10">
+          <div class="flex gap-3">
+            <input
+              type="checkbox"
+              id="contact-consent"
+              name="consentement_rgpd"
+              required
+              value="Oui"
+              class="mt-0.5 h-4 w-4 shrink-0 accent-carbon focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            />
+            <label for="contact-consent" class="font-body text-xs leading-relaxed text-carbon/70">
+              En soumettant ce formulaire, j'accepte que les données saisies soient
+              exploitées par MLD DEV dans le cadre de ma demande et de la relation
+              commerciale qui peut en découler.
+            </label>
+          </div>
+          <p id="contact-consent-erreur" role="alert" class={errorClasses}></p>
         </div>
 
         {/* --- Bouton d'envoi --- */}
@@ -186,20 +204,26 @@ const labelClasses =
           <button
             id="contact-submit"
             type="submit"
-            class="bg-accent px-8 py-4 font-body text-xs font-medium uppercase tracking-[0.18em] text-carbon transition-colors duration-300 hover:bg-carbon hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-50"
+            class="bg-accent px-8 py-4 font-body text-xs font-medium uppercase tracking-[0.18em] text-carbon transition-colors duration-300 hover:bg-carbon hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
           >
             <span id="contact-submit-label">Envoyer ma demande</span>
           </button>
         </div>
 
-        {/* --- Zone de retour (succès / erreur) ---
-            `role="status"` : le message est annoncé sans déplacer le focus. */}
-        <p
-          id="contact-status"
-          role="status"
-          class="mt-8 hidden border-l-2 pl-4 font-body text-sm leading-relaxed text-carbon"
-        >
-        </p>
+        {/* --- Zone de retour globale (succès / échec) ---
+            Le conteneur reste dans le DOM en permanence, vide quand il n'y a
+            rien à dire : une région `aria-live` insérée au moment de l'annonce
+            n'est pas toujours lue, alors qu'une région déjà présente l'est.
+            `aria-live="polite"` : le message est annoncé sans interrompre.
+            Le fondu passe par une transition CSS, neutralisée d'office quand
+            l'utilisateur demande des animations réduites. */}
+        <div id="contact-status" role="status" aria-live="polite" class="mt-8">
+          <p
+            id="contact-status-message"
+            class="font-body text-sm leading-relaxed opacity-0 transition-opacity duration-[400ms] motion-reduce:transition-none"
+          >
+          </p>
+        </div>
       </form>
     </div>
   </div>
@@ -207,82 +231,285 @@ const labelClasses =
 
 <script>
   /* -----------------------------------------------------------------------
-    Envoi du formulaire sans quitter la page
+     Validation et envoi du formulaire
+     La validation native du navigateur est désactivée (`novalidate`) : ses
+     bulles ne sont pas stylables et s'affichent dans la langue du navigateur,
+     pas dans celle du site. Les attributs `required` et `type` restent en
+     place — ils portent l'information pour les technologies d'assistance.
      ----------------------------------------------------------------------- */
   const form = document.getElementById('contact-form') as HTMLFormElement | null;
   const submitButton = document.getElementById('contact-submit') as HTMLButtonElement | null;
   const submitLabel = document.getElementById('contact-submit-label');
-  const status = document.getElementById('contact-status');
+  const statusMessage = document.getElementById('contact-status-message');
 
-  if (form && submitButton && submitLabel && status) {
-    const defaultLabel = submitLabel.textContent ?? 'Envoyer ma demande';
+  if (form && submitButton && submitLabel && statusMessage) {
+    const libelleParDefaut = submitLabel.textContent ?? 'Envoyer ma demande';
 
-    /* Affichage d'un message : filet carbon en cas de succès,
-       filet accent en cas d'erreur (le texte reste lisible dans les deux cas). */
-    const showStatus = (message: string, isError: boolean) => {
-      status.textContent = message;
-      status.classList.remove('hidden');
-      status.classList.toggle('border-accent', isError);
-      status.classList.toggle('border-carbon', !isError);
+    /* -----------------------------------------------------------------------
+       Provenance de la demande
+       Les CTA des cartes de prestations portent un `data-offre`. Au clic, on
+       reporte l'offre dans le champ caché `subject` : l'email reçu indique
+       donc de quelle carte vient la demande.
+       Le libellé est reconstruit à partir du slug plutôt que lu dans une table
+       de correspondance : rien à maintenir en double si une offre est ajoutée
+       ou renommée.
+       ----------------------------------------------------------------------- */
+    const champSujet = form.elements.namedItem('subject') as HTMLInputElement | null;
+
+    if (champSujet) {
+      const sujetParDefaut = champSujet.value;
+
+      const lisible = (slug: string) =>
+        slug
+          .split('-')
+          .join(' ')
+          .replace(/^./, (lettre) => lettre.toUpperCase());
+
+      document.querySelectorAll('[data-offre]').forEach((lien) => {
+        lien.addEventListener('click', () => {
+          const offre = (lien as HTMLElement).dataset.offre;
+          champSujet.value = offre
+            ? `${sujetParDefaut} — offre : ${lisible(offre)}`
+            : sujetParDefaut;
+        });
+      });
+    }
+
+    /* Durée minimale de l'état d'envoi. Sans elle, une réponse en 80 ms ferait
+       clignoter le bouton sans que l'utilisateur perçoive quoi que ce soit :
+       il croirait que son clic n'a pas été pris en compte. */
+    const DUREE_MINIMALE_ENVOI = 400;
+
+    /* Temps pendant lequel le formulaire reste vierge de toute erreur, entre
+       l'effacement et la nouvelle vérification. Même problème que ci-dessus,
+       et il est plus vicieux : effacer puis revalider dans la même frame ne
+       produit aucune image intermédiaire, le navigateur ne peint que l'état
+       final. Les messages semblent donc figés, et l'utilisateur qui vient de
+       corriger un seul champ sur deux croit que le bouton ne répond plus.
+       Cette pause force une image sans erreur : celles qui réapparaissent se
+       lisent alors comme le résultat d'une nouvelle vérification. */
+    const DUREE_EFFACEMENT_ERREURS = 220;
+
+    const pause = (millisecondes: number) =>
+      new Promise((resoudre) => setTimeout(resoudre, millisecondes));
+
+    /* --- Règles de validation ---
+       Les messages disent quoi faire, pas ce qui est faux. */
+    const validations: Record<
+      string,
+      (valeur: string, champ: HTMLInputElement) => string | null
+    > = {
+      'contact-name': (valeur) => {
+        if (!valeur) return 'Indiquez votre nom pour que je sache à qui répondre.';
+        if (valeur.length < 2) return 'Votre nom semble incomplet.';
+        return null;
+      },
+
+      'contact-email': (valeur) => {
+        if (!valeur) return 'Indiquez votre email pour que je puisse vous répondre.';
+        if (!valeur.includes('@')) return 'Il manque un @ dans votre adresse email.';
+        const domaine = valeur.slice(valeur.lastIndexOf('@') + 1);
+        if (!domaine.includes('.')) {
+          return "Il manque l'extension du domaine, par exemple .fr ou .com.";
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(valeur)) {
+          return 'Cette adresse email ne semble pas valide.';
+        }
+        return null;
+      },
+
+      'contact-message': (valeur) => {
+        if (!valeur) return 'Décrivez votre projet en quelques mots.';
+        if (valeur.length < 10) {
+          return "Ajoutez quelques détails, cela m'aidera à mieux vous répondre.";
+        }
+        return null;
+      },
+
+      'contact-consent': (_valeur, champ) => {
+        if (!champ.checked) {
+          return 'Cochez cette case pour que je puisse traiter votre demande.';
+        }
+        return null;
+      },
     };
+
+    const champs = Object.keys(validations)
+      .map((id) => document.getElementById(id) as HTMLInputElement | null)
+      .filter((champ): champ is HTMLInputElement => champ !== null);
+
+    /* Un champ n'est validé en direct qu'après une première soumission :
+       signaler une erreur pendant la frappe initiale serait agressif. */
+    let dejaSoumis = false;
+    let envoiEnCours = false;
+
+    const messageDe = (champ: HTMLInputElement) =>
+      document.getElementById(champ.id + '-erreur');
+
+    const afficherErreur = (champ: HTMLInputElement, texte: string) => {
+      const bloc = messageDe(champ);
+      if (!bloc) return;
+      bloc.textContent = texte;
+      bloc.classList.remove('hidden');
+      champ.setAttribute('aria-invalid', 'true');
+      champ.setAttribute('aria-describedby', bloc.id);
+    };
+
+    const effacerErreur = (champ: HTMLInputElement) => {
+      const bloc = messageDe(champ);
+      if (!bloc) return;
+      bloc.textContent = '';
+      bloc.classList.add('hidden');
+      champ.removeAttribute('aria-invalid');
+      champ.removeAttribute('aria-describedby');
+    };
+
+    const validerChamp = (champ: HTMLInputElement) => {
+      const regle = validations[champ.id];
+      if (!regle) return true;
+      const erreur = regle(champ.value.trim(), champ);
+      if (erreur) {
+        afficherErreur(champ, erreur);
+        return false;
+      }
+      effacerErreur(champ);
+      return true;
+    };
+
+    /* --- Message global --- */
+    const afficherStatut = (texte: string, estErreur: boolean) => {
+      statusMessage.textContent = texte;
+      statusMessage.classList.toggle('text-error', estErreur);
+      statusMessage.classList.toggle('text-accent', !estErreur);
+      /* Le fondu ne se rejoue que si l'opacité change réellement : on repart
+         donc de 0 avant de remonter à 1 sur la frame suivante. */
+      statusMessage.classList.remove('opacity-100');
+      statusMessage.classList.add('opacity-0');
+      requestAnimationFrame(() => {
+        statusMessage.classList.remove('opacity-0');
+        statusMessage.classList.add('opacity-100');
+      });
+    };
+
+    const effacerStatut = () => {
+      statusMessage.textContent = '';
+      statusMessage.classList.remove('opacity-100', 'text-error', 'text-accent');
+      statusMessage.classList.add('opacity-0');
+    };
+
+    /* Validation en direct, une fois la première soumission passée : l'erreur
+       disparaît dès que l'utilisateur corrige. */
+    champs.forEach((champ) => {
+      const evenement = champ.type === 'checkbox' ? 'change' : 'input';
+      champ.addEventListener(evenement, () => {
+        if (dejaSoumis) validerChamp(champ);
+      });
+    });
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
 
-      /* Validation native : on laisse le navigateur signaler les champs
-         manquants, y compris la case RGPD. */
-      if (!form.reportValidity()) return;
-
-      const payload = Object.fromEntries(new FormData(form));
-
-      /* Garde-fou de configuration : sans clé, l'API renverrait une erreur
-         incompréhensible pour le visiteur. */
-      if (!payload.access_key) {
-        showStatus(
-          "Le formulaire n'est pas encore configuré (clé Web3Forms manquante). Écrivez-moi directement par email en attendant.",
-          true
-        );
-        return;
-      }
-
-      /* État de chargement */
-      submitButton.disabled = true;
-      submitButton.setAttribute('aria-busy', 'true');
-      submitLabel.textContent = 'Envoi en cours…';
+      /* Toute soumission déjà en cours de traitement bloque les suivantes —
+         y compris pendant la pause d'effacement ci-dessous, sinon des clics
+         répétés relanceraient plusieurs cycles imbriqués. Le drapeau est levé
+         ici, et abaissé dans le `finally` quel que soit le chemin de sortie. */
+      if (envoiEnCours) return;
+      envoiEnCours = true;
 
       try {
-        const response = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-          body: JSON.stringify(payload),
-        });
-        const result = await response.json();
+        /* Remise à zéro AVANT tout : sans elle, un second envoi en échec
+           laisserait le message précédent à l'écran et l'utilisateur croirait
+           que rien ne s'est passé. */
+        effacerStatut();
+        champs.forEach(effacerErreur);
 
-        if (response.ok) {
-          showStatus(
-            'Merci, votre demande est bien arrivée. Je vous réponds sous 24 heures ouvrées.',
-            false
+        /* La pause rend l'effacement visible (voir DUREE_EFFACEMENT_ERREURS).
+           `dejaSoumis` n'est levé qu'après : pendant la pause, la validation
+           en direct est encore muette, sinon une frappe dans l'intervalle
+           ferait ressurgir l'erreur avant même la nouvelle vérification. */
+        await pause(DUREE_EFFACEMENT_ERREURS);
+        dejaSoumis = true;
+
+        /* On valide tous les champs sans s'arrêter au premier : l'utilisateur
+           voit d'un coup tout ce qu'il reste à corriger. */
+        const enErreur = champs.filter((champ) => !validerChamp(champ));
+
+        if (enErreur.length > 0) {
+          // Focus sur le premier champ fautif, dans l'ordre du formulaire
+          enErreur[0].focus();
+          return;
+        }
+
+        const payload = Object.fromEntries(new FormData(form));
+
+        /* Garde-fou de configuration : sans clé, l'API renverrait une erreur
+           incompréhensible pour le visiteur. */
+        if (!payload.access_key) {
+          afficherStatut(
+            "Le formulaire n'est pas encore configuré (clé Web3Forms manquante). Écrivez-moi directement par email en attendant.",
+            true
           );
-          form.reset();
-        } else {
-          showStatus(
-            result?.message ??
-              "L'envoi a échoué. Réessayez dans un instant ou écrivez-moi directement par email.",
+          return;
+        }
+
+        // --- État d'envoi ---
+        submitButton.disabled = true;
+        submitButton.setAttribute('aria-busy', 'true');
+        submitLabel.textContent = 'Envoi en cours...';
+
+        const attenteMinimale = pause(DUREE_MINIMALE_ENVOI);
+
+        try {
+          const [reponse] = await Promise.all([
+            fetch('https://api.web3forms.com/submit', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+              },
+              body: JSON.stringify(payload),
+            }),
+            attenteMinimale,
+          ]);
+
+          /* Web3Forms peut répondre 200 en signalant un échec applicatif : le
+             statut HTTP ne suffit pas, on lit aussi le champ `success`. */
+          const resultat = await reponse.json().catch(() => null);
+          const reussi = reponse.ok && resultat?.success === true;
+
+          if (reussi) {
+            afficherStatut('Merci pour votre message, je vous réponds dans les 24h.', false);
+            form.reset();
+            champs.forEach(effacerErreur);
+            /* Le formulaire est vide : la validation en direct redevient
+               muette, sinon chaque champ remis à blanc s'afficherait aussitôt
+               en erreur au premier caractère saisi pour une nouvelle demande. */
+            dejaSoumis = false;
+          } else {
+            // TODO: email de contact
+            afficherStatut(
+              "Une erreur est survenue, veuillez réessayer dans un instant ou m'écrire directement à contact@mld-dev.com.",
+              true
+            );
+            // Les champs ne sont PAS vidés : l'envoi doit pouvoir être retenté
+          }
+        } catch {
+          /* Coupure réseau, DNS injoignable, requête bloquée : sans ce filet,
+             l'échec resterait silencieux dans la console. */
+          afficherStatut(
+            "Une erreur est survenue, veuillez réessayer dans un instant ou m'écrire directement à contact@mld-dev.com.",
             true
           );
         }
-      } catch {
-        showStatus(
-          "L'envoi a échoué, probablement un problème de connexion. Réessayez dans un instant ou écrivez-moi directement par email.",
-          true
-        );
       } finally {
+        /* Remise en état commune à toutes les sorties — erreur de saisie, clé
+           manquante, échec réseau ou succès. Les trois dernières lignes ne
+           font rien si l'envoi n'a jamais démarré : le bouton n'avait pas
+           bougé. */
+        envoiEnCours = false;
         submitButton.disabled = false;
         submitButton.removeAttribute('aria-busy');
-        submitLabel.textContent = defaultLabel;
+        submitLabel.textContent = libelleParDefaut;
       }
     });
   }

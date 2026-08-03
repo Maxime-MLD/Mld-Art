@@ -16,6 +16,9 @@
   --color-paper:  #EDEBE9;  /* Fond principal (60 %) — papier-lin haut de gamme */
   --color-carbon: #1A1A1A;  /* Texte & structure (30 %) — carbone mat, jamais de noir pur */
   --color-accent: #FF6600;  /* Accent (10 %) — uniquement les actions clés */
+  --color-error:  #B3261E;  /* Erreurs de formulaire — rouge sourd, désaturé :
+                               il tient sur le fond crème sans jurer avec
+                               l'anthracite, là où un rouge vif trancherait */
 
   --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-body:    "Inter", ui-sans-serif, system-ui, sans-serif;

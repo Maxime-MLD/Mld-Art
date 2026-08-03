@@ -11,24 +11,62 @@
 interface Props {
   title: string;
   description: string;
+  /* Le montant seul — « 40 € », « sur devis ». La périodicité est un champ
+     distinct : la mention TTC doit s'intercaler ENTRE les deux, pour donner
+     « 40 € TTC / mois » et non « 40 € / mois TTC ». Une chaîne unique aurait
+     obligé à la découper à l'affichage. */
   price: string;
+  pricePeriod?: string;
+  /* Affichage de la mention TTC. Une prop explicite, et non un test sur le
+     contenu de `price` : « sur devis » pourrait devenir « à partir de… » ou
+     « nous consulter » sans que personne ne pense à mettre la condition à
+     jour. La décision appartient à la donnée, pas au rendu. */
+  showTTC?: boolean;
   features: string[];
+  ctaLabel: string;
+  ctaHref: string;
+  /* Identifiant de l'offre, transmis au formulaire de contact au clic (voir
+     le script de Contact.astro) : il permet de savoir de quelle carte vient
+     chaque demande. */
+  offre?: string;
   /* Conservé pour ne pas modifier les appels existants, mais sans effet :
      l'accent s'applique désormais au prix ET aux puces dans toutes les
      cartes. À retirer ici et dans Services.astro lors d'un prochain passage. */
   accent?: 'price' | 'features';
 }
 
-const { title, description, price, features } = Astro.props;
+const {
+  title,
+  description,
+  price,
+  pricePeriod,
+  showTTC = true,
+  features,
+  ctaLabel,
+  ctaHref,
+  offre,
+} = Astro.props;
+
+/* La mention accolée au prix est assemblée ici plutôt que dans le gabarit :
+   sans TTC, il ne doit rester ni espace en tête ni chaîne vide qui laisserait
+   traîner la marge du bloc. `filter(Boolean)` écarte les deux morceaux
+   absents, `join` ne pose l'espace que s'il reste les deux. */
+const mentionPrix = [showTTC ? 'TTC' : null, pricePeriod]
+  .filter(Boolean)
+  .join(' ');
 ---
 
 {/* `bg-paper` est indispensable : la grille parente laisse apparaître son
    fond `carbon/10` dans les gouttières de 1px, ce qui dessine les filets.
    Le padding horizontal reprend celui des sections pour que le titre de la
    première colonne s'aligne exactement sur le H2 de la section. */}
+{/* `h-full` + `flex-col` : c'est ce qui permet au `mt-auto` du bouton de
+   pousser celui-ci en bas de carte. Sans hauteur pleine, la carte se
+   contenterait de sa hauteur de contenu et les boutons se retrouveraient
+   décalés d'une colonne à l'autre. */}
 <article
   data-anim
-  class="flex flex-col bg-paper px-6 py-12 md:px-10 md:py-14 lg:px-16 lg:py-16 xl:px-24"
+  class="flex h-full flex-col bg-paper px-6 py-12 md:px-10 md:py-14 lg:px-16 lg:py-16 xl:px-24"
 >
   {/* --- Intitulé de la prestation --- */}
   <h3 class="font-display text-2xl font-bold leading-tight tracking-[-0.02em] text-carbon">
@@ -40,11 +78,28 @@ const { title, description, price, features } = Astro.props;
     {description}
   </p>
 
-  {/* --- Prix — aplat orange, texte carbon (contraste 5,93:1) --- */}
-  <div class="mt-10">
-    <p class="inline-block bg-accent px-4 py-2 font-display text-2xl font-bold tracking-tight text-carbon">
+  {/* --- Prix — aplat orange, texte carbon (contraste 5,93:1) ---
+      La mention TTC est posée À CÔTÉ de l'aplat, sur le fond papier, et non
+      dedans : l'aplat orange reste au seul montant, conformément à la règle
+      « le prix garde seul la couleur ». C'est aussi ce qui la rend lisible —
+      sur l'orange, du carbon/50 tombe à 2,50:1 et il aurait fallu monter à
+      carbon/85 pour passer le seuil AA, au point de ne plus se distinguer du
+      prix. Sur le papier, carbon/65 donne 5,03:1 tout en restant discret.
+      `items-baseline` aligne la mention sur la ligne de base du montant, et
+      non sur son centre optique.
+      La mention n'est rendue que si elle a un contenu : sur une prestation
+      chiffrée au cas par cas, « TTC » n'annonce rien et le prix reste seul. */}
+  <div class="mt-10 flex flex-wrap items-baseline">
+    <p class="bg-accent px-4 py-2 font-display text-2xl font-bold tracking-tight text-carbon">
       {price}
     </p>
+    {
+      mentionPrix && (
+        <span class="ml-1.5 font-body text-xs font-normal normal-case text-carbon/65">
+          {mentionPrix}
+        </span>
+      )
+    }
   </div>
 
   {/* --- Détail de la prestation, séparé par un filet fin --- */}
@@ -69,4 +124,28 @@ const { title, description, price, features } = Astro.props;
       ))
     }
   </ul>
+
+  {/* --- Appel à l'action ---
+      Classes reprises telles quelles du bouton « ME CONTACTER » de la navbar,
+      y compris son `tracking-[0.18em]` — et non `tracking-wider`, qui vaut
+      0,05em et aurait donné un rendu différent.
+      `mt-auto` pousse le bouton en bas : les boutons des cinq cartes
+      s'alignent donc entre eux malgré des descriptions de longueurs
+      différentes.
+      `inline-flex` + `min-h-[44px]` : avec le seul `py-3` de la navbar, la
+      hauteur tombe à 42px. C'est sans conséquence dans la navbar, réservée au
+      desktop, mais ici le bouton est cliquable au doigt — il lui faut les
+      44px de cible tactile.
+      `data-offre` plutôt qu'un paramètre dans le href : `#contact?offre=x`
+      n'est pas une ancre valide, le navigateur chercherait un élément dont
+      l'id est littéralement « contact?offre=x » et ne défilerait pas. */}
+  <div class="mt-auto pt-12">
+    <a
+      href={ctaHref}
+      data-offre={offre}
+      class="inline-flex min-h-[44px] items-center rounded-none border border-carbon px-6 py-3 font-body text-xs font-medium uppercase tracking-[0.18em] text-carbon transition-colors duration-300 hover:bg-carbon hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+    >
+      {ctaLabel}
+    </a>
+  </div>
 </article>

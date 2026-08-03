@@ -82,10 +82,15 @@ const linkClasses =
     </div>
 
     {/* ==================================================================
-        FILET puis ligne de copyright
+        LIGNE DE COPYRIGHT puis filet
+        Le filet ferme la ligne par le bas (`border-b`) au lieu de l'ouvrir
+        par le haut : la mention légale appartient au bloc de contenu, et le
+        watermark reste seul en dessous du trait, comme une signature au bas
+        d'une toile. Disposition inchangée — copyright à gauche, mentions
+        légales à droite à partir de `md`.
         ================================================================== */}
     <div
-      class="flex flex-col gap-4 border-t border-carbon/10 py-8 md:flex-row md:items-center md:justify-between"
+      class="flex flex-col gap-4 border-b border-carbon/10 py-8 mb-32 md:flex-row md:items-center md:justify-between"
     >
       {/* Copyright — le second « MLD DEV » renvoie vers le site */}
       <p class="font-body text-xs leading-relaxed text-carbon/65">
