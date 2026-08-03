@@ -37,9 +37,9 @@ interface Props {
 }
 
 const {
-  title = 'MLD DEV | Agence Web à Roanne - Création de Sites Internet',
+  title = 'Création de sites internet à Roanne | MLD DEV',
   description =
-    'Agence web à Roanne, MLD DEV crée des sites vitrines sur mesure, rapides et optimisés pour aider artisans et entreprises à gagner des clients.',
+    'Agence web à Roanne, MLD DEV crée des sites vitrines sur mesure, rapides et optimisés pour aider les artisans et entreprises à attirer plus de clients.',
   noindex = false,
 } = Astro.props;
 
@@ -220,7 +220,12 @@ const structuredDataNettoye =
 
     {/* --- Favicon --- */}
     {/* TODO: remplacer par le favicon définitif */}
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any" />
+    <link rel="icon" href="/favicon-ico.ico" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/images/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" href="/images/favicon-apple.png" sizes="180x180" />
+    <meta name="apple-mobile-web-app-title" content="MLD DEV" />
+
 
     {/* --- Données structurées JSON-LD (SEO local Roanne & Loire) --- */}
     <script
